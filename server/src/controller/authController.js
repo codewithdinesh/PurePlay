@@ -67,8 +67,12 @@ const SignUp = async (req, res) => {
       });
     }
 
+    const salt = 10;
+    console.log("Password", password + " " + email)
+
     // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10); // You can adjust the salt rounds
+    const hashedPassword = await bcrypt.hash(password, salt);
+    // const hashedPassword = "randome";
 
     // Create a new user in the MySQL database
     let insertUserQuery =

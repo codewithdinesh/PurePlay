@@ -1,17 +1,18 @@
-const { check, validationResult } = require("express-validator");
+const { check, validationResult, body } = require("express-validator");
 
+// singup input validation
 const SIGNUP_VALIDATOR = [
-  check("firstName").notEmpty().withMessage("firstName is required"),
-  check("lastName").notEmpty().withMessage("lastName is required"),
-  check("email").notEmpty().withMessage("email is required"),
-  check("password").notEmpty().withMessage("password is required"),
-  check("usertype")
+  body("firstName").notEmpty().withMessage("firstName is required"),
+  body("lastName").notEmpty().withMessage("lastName is required"),
+  body("email").notEmpty().withMessage("email is required"),
+  body("password").notEmpty().withMessage("password is required"),
+  body("usertype")
     .if(check("admin_secret").isEmpty())
     .notEmpty()
     .withMessage("usertype is required")
     .isIn(["creator", "viewer"])
     .withMessage("usertype must be either 'user' or 'admin'"),
-  check("admin_secret")
+  body("admin_secret")
     .if(check("usertype").isEmpty()) // Make admin_secret required only if usertype is not empty
     .notEmpty()
     .withMessage("admin_secret is required"),

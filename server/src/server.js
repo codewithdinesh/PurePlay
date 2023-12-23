@@ -22,6 +22,10 @@ async function main() {
 
 main();
 
+app.use(express.urlencoded({
+  extended: false
+}))
+
 app.get("/", (req, res, next) => {
   res.status(200).json({
     message: "Hello World",
