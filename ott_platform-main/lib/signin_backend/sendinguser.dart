@@ -33,6 +33,12 @@ class AuthService1 {
         onSuccess: () {
           print("Yay! Logged IN");
         },
+        onError: (error) {
+          // Display an error message
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        },
       );
     } catch (e) {
       // ignore: use_build_context_synchronously
@@ -44,17 +50,21 @@ class AuthService1 {
   void signUpUser(
       {required BuildContext context,
       required String email,
-      required String name,
+      required String firstName,
+      required String lastName,
       required String password,
-      required String confirmpassword}) async {
-    
+      required String confirmpassword,
+      required String username}) async {
     try {
       UserStruct user = UserStruct(
           id: '',
-          name: name,
+          firstName: firstName,
+          lastName: lastName,
           email: email,
           password: password,
+          username: username,
           confirmpassword: confirmpassword);
+
       print(Uri.parse('$uri/auth/v1/signup'));
       http.Response res = await http.post(Uri.parse('$uri/auth/v1/signup'),
           body: user.toJson(),
@@ -64,15 +74,21 @@ class AuthService1 {
 
       // ignore: use_build_context_synchronously
       httpErrorHandle(
-        response: res,
-        context: context,
-        onSuccess: () {
-          showSnackBar(
-            context,
-            'Account created! Login with same credentials',
-          );
-        },
-      );
+          response: res,
+          context: context,
+          onSuccess: () {
+            print("Yay! Logged IN");
+            // Display a success message if needed
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Login successful!")),
+            );
+          },
+          onError: (error) {
+            // Display an error message
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error.toString())),
+            );
+          });
     } catch (e) {
       // ignore: use_build_context_synchronously
       showSnackBar(context, e.toString());

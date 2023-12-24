@@ -2,24 +2,31 @@ import 'dart:convert';
 
 class UserStruct {
   final String id;
-  final String name;
+  final String firstName;
+  final String lastName;
   final String email;
   final String password;
+  final String username;
   final String confirmpassword;
+
   UserStruct(
       {required this.id,
-      required this.name,
+      required this.firstName,
+      required this.lastName,
       required this.email,
       required this.password,
+      required this.username,
       required this.confirmpassword});
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'name': name,
+      'firstName': firstName,
+      'lastName': lastName,
       'email': email,
+      'username': username,
       'password': password,
-      'confirmpassword': confirmpassword
+      'confirmpassword': confirmpassword,
     };
   }
 
@@ -28,10 +35,12 @@ class UserStruct {
 
     return UserStruct(
       id: map['id'],
-      name: map['name'],
+      firstName: map['firstName'],
+      lastName: map['lastName'],
       email: map['email'],
       password: map['password'],
       confirmpassword: map['confirmpassword'],
+      username: map['username']
     );
   }
 

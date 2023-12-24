@@ -7,7 +7,7 @@ import 'package:ott_platform_app/signin_backend/snackbar.dart';
 void httpErrorHandle({
   required http.Response response,
   required BuildContext context,
-  required VoidCallback onSuccess,
+  required VoidCallback onSuccess, required Null Function(dynamic error) onError,
 }) {
   switch (response.statusCode) {
     case 200:

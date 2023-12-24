@@ -21,6 +21,7 @@ class _RegisterViewState extends State<RegisterView> {
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
+  TextEditingController txtUsername= TextEditingController();
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
 
@@ -32,7 +33,9 @@ class _RegisterViewState extends State<RegisterView> {
     authService.signUpUser(
         context: context,
         email: txtEmail.text,
-        name: txtFirstName.text + txtLastName.text,
+        firstName: txtFirstName.text ,
+        lastName: txtLastName.text,
+        username: txtUsername.text,
         password: txtPassword.text,
         confirmpassword: txtConfirmPassword.text);
   }
