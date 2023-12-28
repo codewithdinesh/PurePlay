@@ -7,9 +7,9 @@ import 'package:ott_platform_app/common_widget/round_button.dart';
 import 'package:ott_platform_app/common_widget/round_text_field.dart';
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
+import 'package:ott_platform_app/services/auth_service.dart';
 import 'package:ott_platform_app/user_view/login/register_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
-import 'package:ott_platform_app/signin_backend/sendinguser.dart';
 import 'package:ott_platform_app/utils/Navigate.dart';
 import 'package:ott_platform_app/utils/snackbar.dart';
 
@@ -26,6 +26,30 @@ class _LoginViewState extends State<LoginView> {
   TextEditingController txtEmail = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
 
+  final AuthServices authServices = AuthServices();
+
+  @override
+  void initState() {
+    super.initState();
+    // Check user login status when the widget is initialized
+    checkUserLoginStatus();
+  }
+
+  // Check Login Status
+  Future<void> checkUserLoginStatus() async {
+    AuthServices authServices = AuthServices();
+    String? userToken = await authServices.getUserToken();
+
+    if (userToken != null) {
+      print('User is logged in with token: $userToken');
+      // User is logged in, navigate to the main screen or perform other actions
+
+      // TO-DO: Verify Token is valid or not with the backend
+      Navigate.toPageWithReplacement(context, const MainTabView());
+    }
+  }
+
+// For loading
   bool isLoggingIn = false;
 
   Future<void> loginUser() async {
@@ -41,6 +65,7 @@ class _LoginViewState extends State<LoginView> {
 
       if (txtPassword.text.isEmpty) {
         showSnackBar(context, "Please enter your password.", isError: true);
+
         return;
       }
 
@@ -59,6 +84,13 @@ class _LoginViewState extends State<LoginView> {
 
       if (res.statusCode == 200 || res.statusCode == 201) {
         showSnackBar(context, "Login Successful");
+
+        Map<String, dynamic> successResponse = jsonDecode(res!.body);
+        String userToken = successResponse['token'];
+
+        // Store Login Token in the Google AUth Secure Storage
+
+        await AuthServices().saveUserToken(userToken);
 
         // Navigate to the main tab view after successful login
         Navigate.toPageWithReplacement(context, const MainTabView());

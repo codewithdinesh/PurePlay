@@ -115,7 +115,7 @@ const SignUp = async (req, res) => {
   }
 };
 
-
+//  SignIn Controller
 const SignIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -133,7 +133,7 @@ const SignIn = async (req, res) => {
           return res.status(404).json({ message: "User is not registered." });
 
         } else {
-          
+
           const user = result[0];
           // Compare the provided password with the hashed password
           const isAuthenticated = await bcrypt.compare(password, user.password);
