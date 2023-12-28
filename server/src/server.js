@@ -1,7 +1,9 @@
 /* Author: SANJU BODRA */
 
 const express = require("express");
+const cors = require('cors');
 const { connectDB } = require("./config/db");
+
 const app = express();
 
 const authRoutes = require("./routes/authRoutes");
@@ -14,17 +16,27 @@ async function main() {
   require("dotenv").config();
 
   // Mibbleware configuration
+  app.use(cors())
   app.use(express.json());
 
+  app.use(express.urlencoded({
+    extended: false
+  }))
+
   // Connect to Database
-  await connectDB();
+  try {
+    await connectDB();
+    console.log('Connected to the database');
+  } catch (error) {
+    console.error('Failed to connect to the database:', error.message);
+    process.exit(1); // Exit the process if unable to connect to the database
+  }
 }
 
 main();
 
-app.use(express.urlencoded({
-  extended: false
-}))
+
+
 
 app.get("/", (req, res, next) => {
   res.status(200).json({

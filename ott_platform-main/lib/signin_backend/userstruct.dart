@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class UserStruct {
-  final String id;
+  final String? id;
   final String firstName;
   final String lastName;
   final String email;
@@ -9,14 +9,15 @@ class UserStruct {
   final String username;
   final String confirmpassword;
 
-  UserStruct(
-      {required this.id,
-      required this.firstName,
-      required this.lastName,
-      required this.email,
-      required this.password,
-      required this.username,
-      required this.confirmpassword});
+  UserStruct({
+    this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+    required this.password,
+    required this.username,
+    required this.confirmpassword,
+  });
 
   Map<String, dynamic> toMap() {
     return {
@@ -24,15 +25,18 @@ class UserStruct {
       'firstName': firstName,
       'lastName': lastName,
       'email': email,
-      'username': username,
       'password': password,
+      'username': username,
       'confirmpassword': confirmpassword,
     };
   }
 
-  factory UserStruct.fromMap(Map<String, dynamic> map) {
-    // ignore: unnecessary_null_comparison
+  String toFormUrlEncoded() {
+    final encodedData = Uri.encodeQueryComponent(jsonEncode(toMap()));
+    return 'data=$encodedData';
+  }
 
+  factory UserStruct.fromMap(Map<String, dynamic> map) {
     return UserStruct(
       id: map['id'],
       firstName: map['firstName'],
@@ -40,7 +44,7 @@ class UserStruct {
       email: map['email'],
       password: map['password'],
       confirmpassword: map['confirmpassword'],
-      username: map['username']
+      username: map['username'],
     );
   }
 

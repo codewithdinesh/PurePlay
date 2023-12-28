@@ -1,11 +1,18 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:ott_platform_app/common/color_extension.dart';
+import 'package:ott_platform_app/common_widget/round_button.dart';
+import 'package:ott_platform_app/common_widget/round_text_field.dart';
+import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
 import 'package:ott_platform_app/user_view/login/register_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
 import 'package:ott_platform_app/signin_backend/sendinguser.dart';
-import '../../common/color_extension.dart';
-import '../../common_widget/round_button.dart';
-import '../../common_widget/round_text_field.dart';
+import 'package:ott_platform_app/utils/Navigate.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
+
 import 'forgot_password_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -19,13 +26,66 @@ class _LoginViewState extends State<LoginView> {
   TextEditingController txtEmail = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
 
-  final AuthService1 authService = AuthService1();
-  void signInUser() {
-    authService.signInUser(
-      context: context,
-      email: txtEmail.text,
-      password: txtPassword.text,
-    );
+  bool isLoggingIn = false;
+
+  Future<void> loginUser() async {
+    setState(() {
+      isLoggingIn = true;
+    });
+
+    try {
+      if (txtEmail.text.isEmpty) {
+        showSnackBar(context, "Please enter your email.", isError: true);
+        return;
+      }
+
+      if (txtPassword.text.isEmpty) {
+        showSnackBar(context, "Please enter your password.", isError: true);
+        return;
+      }
+
+      Map<String, String> credentials = {
+        'email': txtEmail.text,
+        'password': txtPassword.text,
+      };
+
+      http.Response res = await http.post(
+        Uri.parse('$uri/auth/v1/login'),
+        headers: <String, String>{
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: credentials,
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        showSnackBar(context, "Login Successful");
+
+        // Navigate to the main tab view after successful login
+        Navigate.toPageWithReplacement(context, const MainTabView());
+      } else if (res.statusCode == 401 ||
+          res.statusCode == 404 ||
+          res.statusCode == 500 ||
+          res.statusCode == 409) {
+        // Handle Errors
+
+
+        Map<String, dynamic> errorResponse = jsonDecode(res!.body);
+        String errorMessage = errorResponse['error'] ??
+            errorResponse['message'] ??
+            'Unknown error';
+        showSnackBar(context, errorMessage, isError: true);
+      } else {
+        // Handle other status codes as needed
+        showSnackBar(context, "Unexpected error occurred.", isError: true);
+      }
+    } catch (e) {
+      print("try:" + e.toString());
+      showSnackBar(context, e.toString(), isError: true);
+    } finally {
+      setState(() {
+        isLoggingIn = false;
+      });
+    }
   }
 
   @override
@@ -33,7 +93,9 @@ class _LoginViewState extends State<LoginView> {
     var media = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: TColor.bg,
-      /* floatingActionButton: FloatingActionButton(
+
+      // Color Mode
+      floatingActionButton: FloatingActionButton(
         backgroundColor: TColor.primary1,
         onPressed: () {
           TColor.tModeDark = !TColor.tModeDark;
@@ -45,7 +107,9 @@ class _LoginViewState extends State<LoginView> {
           TColor.tModeDark ? Icons.light_mode : Icons.dark_mode,
           color: TColor.text,
         ),
-      ),*/
+      ),
+
+      // Login Page
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -104,6 +168,8 @@ class _LoginViewState extends State<LoginView> {
                       ),
                     ),
                   ),
+
+                  // Email Input
                   RoundTextField(
                     title: "EMAIL",
                     hintText: "email here",
@@ -113,6 +179,8 @@ class _LoginViewState extends State<LoginView> {
                   const SizedBox(
                     height: 20,
                   ),
+
+                  // Password Input
                   RoundTextField(
                     title: "PASSWORD",
                     hintText: "password here",
@@ -126,6 +194,8 @@ class _LoginViewState extends State<LoginView> {
                                 builder: (context) =>
                                     const ForgotPasswordView()));
                       },
+
+                      // Forgot Password
                       child: Text(
                         "FORGOT?",
                         style: TextStyle(
@@ -138,15 +208,19 @@ class _LoginViewState extends State<LoginView> {
                   const SizedBox(
                     height: 30,
                   ),
+
+                  // Login Button
                   RoundButton(
                     title: "LOGIN",
                     onPressed: () {
-                      signInUser();
+                      loginUser();
                     },
                   ),
                   const SizedBox(
                     height: 25,
                   ),
+
+                  // Social Logins
                   Row(
                     children: [
                       Expanded(

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/main.dart';
-import 'package:ott_platform_app/signin_backend/snackbar.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 import 'package:ott_platform_app/upload_videos/error_handlingcontent.dart';
 import 'package:ott_platform_app/upload_videos/sending_video.dart';
 import 'package:path/path.dart' as path;

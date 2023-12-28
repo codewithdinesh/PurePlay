@@ -72,8 +72,7 @@ const SignUp = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, salt);
-    // const hashedPassword = "randome";
-
+  
     // Create a new user in the MySQL database
     let insertUserQuery =
       "INSERT INTO users (firstName, lastName, email, password, username) VALUES (?, ?, ?, ?, ?)";
@@ -129,9 +128,12 @@ const SignIn = async (req, res) => {
         if (err) {
           console.error("Error in SignIn:", err);
           return res.status(500).json({ message: "Internal server error." });
+
         } else if (result.length === 0) {
           return res.status(404).json({ message: "User is not registered." });
+
         } else {
+          
           const user = result[0];
           // Compare the provided password with the hashed password
           const isAuthenticated = await bcrypt.compare(password, user.password);

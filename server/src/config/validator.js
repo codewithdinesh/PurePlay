@@ -4,8 +4,9 @@ const { check, validationResult, body } = require("express-validator");
 const SIGNUP_VALIDATOR = [
   body("firstName").notEmpty().withMessage("firstName is required"),
   body("lastName").notEmpty().withMessage("lastName is required"),
-  body("email").notEmpty().withMessage("email is required"),
+  body("email").notEmpty().normalizeEmail().isEmail().withMessage("email is required"),
   body("password").notEmpty().withMessage("password is required"),
+
   body("usertype")
     .if(check("admin_secret").isEmpty())
     .notEmpty()
@@ -19,8 +20,8 @@ const SIGNUP_VALIDATOR = [
 ];
 
 const LOGIN_VALIDATOR = [
-  check("email").notEmpty().isEmail().withMessage("email is required"),
-  check("password").notEmpty().withMessage("password is required"),
+  body("email").notEmpty().isEmail().withMessage("email is required"),
+  body("password").notEmpty().withMessage("password is required"),
 ];
 
 const UPLOAD_CONTENT_VALIDATOR = [

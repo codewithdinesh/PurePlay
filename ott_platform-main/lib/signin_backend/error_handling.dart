@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ott_platform_app/signin_backend/snackbar.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 
 void httpErrorHandle({
   required http.Response response,

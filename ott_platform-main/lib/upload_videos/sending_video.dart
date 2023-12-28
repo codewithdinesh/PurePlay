@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ott_platform_app/global.dart';
-import 'package:ott_platform_app/signin_backend/snackbar.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 import 'package:ott_platform_app/upload_videos/error_handlingcontent.dart';
 import 'package:ott_platform_app/upload_videos/videostruct.dart';
 

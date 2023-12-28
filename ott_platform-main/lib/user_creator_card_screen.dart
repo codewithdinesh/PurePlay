@@ -1,26 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:ott_platform_app/common_widget/custom_button.dart';
-
 import 'common/color_extension.dart';
 
-class UserCreatorCardScreen extends StatefulWidget {
-  const UserCreatorCardScreen({super.key});
+class UserCreatorCardScreen extends StatelessWidget {
+  const UserCreatorCardScreen({Key? key}) : super(key: key);
 
-  @override
-  State<UserCreatorCardScreen> createState() => _UserCreatorCardScreenState();
-}
-
-class _UserCreatorCardScreenState extends State<UserCreatorCardScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Container(
-        margin: EdgeInsets.all(20),
+        margin: const EdgeInsets.all(20),
         child: Center(
           child: Column(
             children: [
-              SizedBox(
+              const SizedBox(
                 height: 240,
               ),
               Row(
@@ -33,22 +27,23 @@ class _UserCreatorCardScreenState extends State<UserCreatorCardScreen> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/loginview');
                         },
-                        child: Text(
-                          'user',
-                          style: const TextStyle(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primary3,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: const BorderSide(color: Colors.white),
+                          ),
+                        ),
+                        child: const Text(
+                          'User',
+                          style: TextStyle(
                               fontSize: 17, color: Colors.white),
                         ),
-                        style: ElevatedButton.styleFrom(
-                            primary: primary3,
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                              side: const BorderSide(color: Colors.white),
-                            )),
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 20,
                   ),
                   Expanded(
@@ -59,31 +54,32 @@ class _UserCreatorCardScreenState extends State<UserCreatorCardScreen> {
                         onPressed: () {
                           Navigator.pushNamed(context, '/creatorloginview');
                         },
-                        child: Text(
+                        style: ElevatedButton.styleFrom(
+                          primary: primary3,
+                          minimumSize: const Size(double.infinity, 50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                            side: const BorderSide(color: Colors.white),
+                          ),
+                        ),
+                        child: const Text(
                           'Creator',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 17, color: Colors.white),
                         ),
-                        style: ElevatedButton.styleFrom(
-                            primary: primary3,
-                            minimumSize: const Size(double.infinity, 50),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(50),
-                              side: const BorderSide(color: Colors.white),
-                            )),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               TextButton(
                 onPressed: () {
                   Navigator.pushNamed(context, '/adminloginview');
                 },
-                child: Text('Login as admin'),
+                child: const Text('Login as admin'),
               ),
             ],
           ),

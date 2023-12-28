@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/signin_backend/error_handling.dart';
-import 'package:ott_platform_app/signin_backend/snackbar.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 import 'package:ott_platform_app/signin_backend/userstruct.dart';
 
 class AuthService1 {
@@ -65,32 +65,37 @@ class AuthService1 {
           username: username,
           confirmpassword: confirmpassword);
 
-      print(Uri.parse('$uri/auth/v1/signup'));
-      http.Response res = await http.post(Uri.parse('$uri/auth/v1/signup'),
-          body: user.toJson(),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          });
+      print(user.toJson().toString());
+
+      http.Response res = await http.post(
+        Uri.parse('$uri/auth/v1/signup'),
+        headers: <String, String>{
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: user.toFormUrlEncoded(),
+      );
 
       // ignore: use_build_context_synchronously
       httpErrorHandle(
-          response: res,
-          context: context,
-          onSuccess: () {
-            print("Yay! Logged IN");
-            // Display a success message if needed
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Login successful!")),
-            );
-          },
-          onError: (error) {
-            // Display an error message
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
-            );
-          });
+        response: res,
+        context: context,
+        onSuccess: () {
+          print("Yay! Signed up");
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Signup successful!")),
+          );
+        },
+        onError: (error) {
+          print(error.toString());
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error.toString())),
+          );
+        },
+      );
     } catch (e) {
       // ignore: use_build_context_synchronously
+      print("try" +e.toString());
+
       showSnackBar(context, e.toString());
     }
   }

@@ -1,11 +1,17 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
+import 'package:ott_platform_app/signin_backend/error_handling.dart';
 import 'package:ott_platform_app/signin_backend/sendinguser.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
 import 'package:ott_platform_app/signin_backend/userstruct.dart';
+import 'package:ott_platform_app/utils/Navigate.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
@@ -21,23 +27,95 @@ class _RegisterViewState extends State<RegisterView> {
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
-  TextEditingController txtUsername= TextEditingController();
+  TextEditingController txtUsername = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
 
   final ImagePicker picker = ImagePicker();
   XFile? image;
 
-  final AuthService1 authService = AuthService1();
-  void signUpUser() {
-    authService.signUpUser(
-        context: context,
-        email: txtEmail.text,
-        firstName: txtFirstName.text ,
-        lastName: txtLastName.text,
-        username: txtUsername.text,
-        password: txtPassword.text,
-        confirmpassword: txtConfirmPassword.text);
+  bool isSigningUp = false; // Added a flag to track the signup state
+
+  Future<void> signUpUser() async {
+    setState(() {
+      isSigningUp = true; // Set flag to true when signup begins
+    });
+
+    try {
+      if (txtFirstName.text.isEmpty) {
+        showSnackBar(context, "Please enter your first name.", isError: true);
+        return;
+      }
+
+      if (txtLastName.text.isEmpty) {
+        showSnackBar(context, "Please enter your last name.", isError: true);
+        return;
+      }
+
+      if (txtEmail.text.isEmpty) {
+        showSnackBar(context, "Please enter your email.", isError: true);
+        return;
+      }
+
+      if (txtUsername.text.isEmpty) {
+        showSnackBar(context, "Please enter your username.", isError: true);
+        return;
+      }
+
+      if (txtPassword.text.isEmpty) {
+        showSnackBar(context, "Please enter your password.", isError: true);
+        return;
+      }
+
+      if (txtConfirmPassword.text.isEmpty) {
+        showSnackBar(context, "Please confirm your password.", isError: true);
+        return;
+      }
+      Map<String, String> user = {
+        'firstName': txtFirstName.text,
+        'lastName': txtLastName.text,
+        'email': txtEmail.text,
+        'username': txtUsername.text,
+        'password': txtPassword.text,
+        'confirmpassword': txtConfirmPassword.text,
+        'usertype': "viewer"
+      };
+
+      http.Response res = await http.post(
+        Uri.parse('$uri/auth/v1/signup'),
+        headers: <String, String>{
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: user,
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        showSnackBar(context, "User Registered Successfully");
+
+        Navigate.toPageWithReplacement(context, const MainTabView());
+      } else if (res.statusCode == 400 || res.statusCode == 409) {
+        // Handle conflict error such as Bad Request and invalid input
+
+        Map<String, dynamic> errorResponse = jsonDecode(res!.body);
+        String errorMessage = errorResponse['error'] ??
+            errorResponse['message'] ??
+            'Unknown error';
+        showSnackBar(context, errorMessage, isError: true);
+      } else if (res.statusCode == 500) {
+        // Handle internal server error
+        showSnackBar(context, "Internal server error.", isError: true);
+      } else {
+        // Handle other status codes as needed
+        showSnackBar(context, "Unexpected error occurred.", isError: true);
+      }
+    } catch (e) {
+      print("try:" + e.toString());
+      showSnackBar(context, e.toString(), isError: true);
+    } finally {
+      setState(() {
+        isSigningUp = false; // Reset flag after signup completes
+      });
+    }
   }
 
   @override
@@ -153,9 +231,12 @@ class _RegisterViewState extends State<RegisterView> {
                     )
                   ],
                 ),
+
                 const SizedBox(
                   height: 20,
                 ),
+
+                // First Name
                 RoundTextField(
                   title: "FIRST NAME",
                   hintText: "first name here",
@@ -164,6 +245,8 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                // Last Name
                 RoundTextField(
                   title: "LAST NAME",
                   hintText: "last name here",
@@ -172,6 +255,17 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                // Username
+                RoundTextField(
+                    title: "USERNAME",
+                    hintText: "Username here",
+                    controller: txtUsername),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                // Email
                 RoundTextField(
                   title: "EMAIL",
                   hintText: "email here",
@@ -181,6 +275,8 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                // password
                 RoundTextField(
                   title: "PASSWORD",
                   hintText: "password here",
@@ -190,6 +286,8 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                //Confirm Password
                 RoundTextField(
                   title: "CONFIRM PASSWORD",
                   hintText: "confirm password here",
@@ -199,6 +297,8 @@ class _RegisterViewState extends State<RegisterView> {
                 const SizedBox(
                   height: 30,
                 ),
+
+                // Register Button
                 RoundButton(
                   title: "REGISTER",
                   onPressed: () {
