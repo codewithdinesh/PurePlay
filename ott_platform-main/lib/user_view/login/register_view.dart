@@ -8,6 +8,7 @@ import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
 import 'package:ott_platform_app/signin_backend/error_handling.dart';
 import 'package:ott_platform_app/signin_backend/sendinguser.dart';
+import 'package:ott_platform_app/user_view/login/login_view.dart';
 import 'package:ott_platform_app/utils/snackbar.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
 import 'package:ott_platform_app/signin_backend/userstruct.dart';
@@ -92,7 +93,7 @@ class _RegisterViewState extends State<RegisterView> {
       if (res.statusCode == 200 || res.statusCode == 201) {
         showSnackBar(context, "User Registered Successfully");
 
-        Navigate.toPageWithReplacement(context, const MainTabView());
+        Navigate.toPageWithReplacement(context, const LoginView());
       } else if (res.statusCode == 400 || res.statusCode == 409) {
         // Handle conflict error such as Bad Request and invalid input
 

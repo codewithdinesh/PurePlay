@@ -50,7 +50,7 @@ class _LoginViewState extends State<LoginView> {
       };
 
       http.Response res = await http.post(
-        Uri.parse('$uri/auth/v1/login'),
+        Uri.parse('$uri/auth/v1/signin'),
         headers: <String, String>{
           "Content-Type": "application/x-www-form-urlencoded",
         },
@@ -67,7 +67,7 @@ class _LoginViewState extends State<LoginView> {
           res.statusCode == 500 ||
           res.statusCode == 409) {
         // Handle Errors
-
+        // print("res:" + res.body.toString());
 
         Map<String, dynamic> errorResponse = jsonDecode(res!.body);
         String errorMessage = errorResponse['error'] ??
