@@ -4,9 +4,8 @@ const { check, validationResult, body } = require("express-validator");
 const SIGNUP_VALIDATOR = [
   body("firstName").notEmpty().withMessage("firstName is required"),
   body("lastName").notEmpty().withMessage("lastName is required"),
-  body("email").notEmpty().normalizeEmail().isEmail().withMessage("email is required"),
+  body("email").notEmpty().withMessage("email is required").normalizeEmail().isEmail().withMessage("invalid email"),
   body("password").notEmpty().withMessage("password is required"),
-
   body("usertype")
     .if(check("admin_secret").isEmpty())
     .notEmpty()
