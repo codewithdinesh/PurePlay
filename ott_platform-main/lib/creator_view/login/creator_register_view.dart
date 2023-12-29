@@ -1,13 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:ott_platform_app/creator_view/login/creator_login_view.dart';
 import 'package:ott_platform_app/creator_view/main_tab/creator_main_tab_view.dart';
+import 'package:ott_platform_app/user_view/login/login_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
+import 'package:ott_platform_app/utils/Navigate.dart';
+import 'package:ott_platform_app/utils/snackbar.dart';
 
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
+import '../../global.dart';
 
 class CreatorRegisterView extends StatefulWidget {
   const CreatorRegisterView({super.key});
@@ -20,11 +27,98 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
   TextEditingController txtFirstName = TextEditingController();
   TextEditingController txtLastName = TextEditingController();
   TextEditingController txtEmail = TextEditingController();
+  TextEditingController txtUsername = TextEditingController();
   TextEditingController txtPassword = TextEditingController();
   TextEditingController txtConfirmPassword = TextEditingController();
 
   final ImagePicker picker = ImagePicker();
   XFile? image;
+
+  bool isSigningUp = false; // Added a flag to track the signup state
+
+  Future<void> signUpUser() async {
+    setState(() {
+      isSigningUp = true; // Set flag to true when signup begins
+    });
+
+    try {
+      if (txtFirstName.text.isEmpty) {
+        showSnackBar(context, "Please enter your first name.", isError: true);
+        return;
+      }
+
+      if (txtLastName.text.isEmpty) {
+        showSnackBar(context, "Please enter your last name.", isError: true);
+        return;
+      }
+
+      if (txtEmail.text.isEmpty) {
+        showSnackBar(context, "Please enter your email.", isError: true);
+        return;
+      }
+
+      if (txtUsername.text.isEmpty) {
+        showSnackBar(context, "Please enter your username.", isError: true);
+        return;
+      }
+
+      if (txtPassword.text.isEmpty) {
+        showSnackBar(context, "Please enter your password.", isError: true);
+        return;
+      }
+
+      if (txtConfirmPassword.text.isEmpty) {
+        showSnackBar(context, "Please confirm your password.", isError: true);
+        return;
+      }
+      Map<String, String> user = {
+        'firstName': txtFirstName.text,
+        'lastName': txtLastName.text,
+        'email': txtEmail.text,
+        'username': txtUsername.text,
+        'password': txtPassword.text,
+        'confirmpassword': txtConfirmPassword.text,
+        'usertype': "creator"
+      };
+
+      http.Response res = await http.post(
+        Uri.parse('$uri/auth/v1/signup'),
+        headers: <String, String>{
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: user,
+      );
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        showSnackBar(context, "User Registered Successfully");
+
+        // Navigate.toPageWithReplacement(context, const CreatorLoginView());
+        Navigator.pushNamed(context, '/creatorloginview');
+        
+      } else if (res.statusCode == 400 || res.statusCode == 409) {
+        // Handle conflict error such as Bad Request and invalid input
+
+        Map<String, dynamic> errorResponse = jsonDecode(res!.body);
+        String errorMessage = errorResponse['error'] ??
+            errorResponse['message'] ??
+            'Unknown error';
+        showSnackBar(context, errorMessage, isError: true);
+      } else if (res.statusCode == 500) {
+        // Handle internal server error
+        showSnackBar(context, "Internal server error.", isError: true);
+      } else {
+        // Handle other status codes as needed
+        showSnackBar(context, "Unexpected error occurred.", isError: true);
+      }
+    } catch (e) {
+      print("try:" + e.toString());
+      showSnackBar(context, e.toString(), isError: true);
+    } finally {
+      setState(() {
+        isSigningUp = false; // Reset flag after signup completes
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +159,19 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
           ),
         ),
         backgroundColor: TColor.bg,
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: TColor.primary1,
+          onPressed: () {
+            TColor.tModeDark = !TColor.tModeDark;
+            if (mounted) {
+              setState(() {});
+            }
+          },
+          child: Icon(
+            TColor.tModeDark ? Icons.light_mode : Icons.dark_mode,
+            color: TColor.text,
+          ),
+        ),
         body: SingleChildScrollView(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: media.width * 0.1),
@@ -79,9 +186,7 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
                         image =
                             await picker.pickImage(source: ImageSource.gallery);
 
-                            setState(() {
-                              
-                            });
+                        setState(() {});
                       },
                       child: Container(
                         padding: const EdgeInsets.all(4),
@@ -128,25 +233,41 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
                     )
                   ],
                 ),
+
                 const SizedBox(
                   height: 20,
                 ),
+
+                // First Name
                 RoundTextField(
                   title: "FIRST NAME",
                   hintText: "first name here",
-                  controller: txtEmail,
+                  controller: txtFirstName,
                 ),
                 const SizedBox(
                   height: 20,
                 ),
+
+                // Last Name
                 RoundTextField(
                   title: "LAST NAME",
                   hintText: "last name here",
-                  controller: txtEmail,
+                  controller: txtLastName,
                 ),
                 const SizedBox(
                   height: 20,
                 ),
+
+                // Username
+                RoundTextField(
+                    title: "USERNAME",
+                    hintText: "Username here",
+                    controller: txtUsername),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                // Email
                 RoundTextField(
                   title: "EMAIL",
                   hintText: "email here",
@@ -156,6 +277,8 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                // password
                 RoundTextField(
                   title: "PASSWORD",
                   hintText: "password here",
@@ -165,20 +288,23 @@ class _CreatorRegisterViewState extends State<CreatorRegisterView> {
                 const SizedBox(
                   height: 20,
                 ),
+
+                //Confirm Password
                 RoundTextField(
                   title: "CONFIRM PASSWORD",
                   hintText: "confirm password here",
                   obscureText: true,
-                  controller: txtPassword,
+                  controller: txtConfirmPassword,
                 ),
                 const SizedBox(
                   height: 30,
                 ),
+
+                // Register Button
                 RoundButton(
                   title: "REGISTER",
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const CreatorMainTabView() ));
-
+                    signUpUser();
                   },
                 ),
                 const SizedBox(
