@@ -1,0 +1,11 @@
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOjgsInJvbGUiOiJjcmVhdG9yIiwiZW1haWwiOiJ0ZXN0NEBnbWFpbC5jb20iLCJ1c2VybmFtZSI6InRlc3Q0IiwiaWF0IjoxNzAzODc2OTg0LCJleHAiOjE3MDM4ODA1ODR9.infLvsG8gXYJvHXlOPG4-JBKvPMw8lsuW8LdDIWVStE",
+  "data": {
+    "_id": 8,
+    "firstName": "test4",
+    "lastName": "test",
+    "email": "test4@gmail.com",
+    "username": "test4",
+    "role": "creator"
+  }
+}

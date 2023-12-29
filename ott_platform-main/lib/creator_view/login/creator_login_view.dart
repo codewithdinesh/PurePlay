@@ -5,6 +5,7 @@ import 'package:ott_platform_app/creator_view/login/creator_register_view.dart';
 import 'package:ott_platform_app/creator_view/main_tab/creator_main_tab_view.dart';
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
+import 'package:ott_platform_app/model/UserData.dart';
 import 'package:ott_platform_app/services/auth_service.dart';
 import 'package:ott_platform_app/user_view/login/register_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
@@ -89,6 +90,8 @@ class _CreatorLoginViewState extends State<CreatorLoginView> {
         showSnackBar(context, "Login Successful");
 
         Map<String, dynamic> successResponse = jsonDecode(res!.body);
+
+        UserData user = UserData.fromJson(successResponse['data']);
         String userToken = successResponse['token'];
 
         // Store Login Token in the Google AUth Secure Storage
@@ -99,6 +102,8 @@ class _CreatorLoginViewState extends State<CreatorLoginView> {
         // Navigate.toPageWithReplacement(context, const CreatorMainTabView());
 
         Navigator.pushNamed(context, '/creatormaintabview');
+
+
       } else if (res.statusCode == 401 ||
           res.statusCode == 404 ||
           res.statusCode == 500 ||
