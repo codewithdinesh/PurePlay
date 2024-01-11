@@ -20,17 +20,6 @@ const userProfileTable = `CREATE TABLE IF NOT EXISTS user_profiles (
     FOREIGN KEY (user_id) REFERENCES users(id)
   )`;
 
-const contentTable = `CREATE TABLE IF NOT EXISTS content (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    creator_id INT,
-    viewer_count INT DEFAULT 1,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (creator_id) REFERENCES users(id)
-  )`;
-
 const adminApprovalTable = `CREATE TABLE IF NOT EXISTS admin_approvals (
     id INT AUTO_INCREMENT PRIMARY KEY,
     creator_id INT,
@@ -42,6 +31,18 @@ const adminApprovalTable = `CREATE TABLE IF NOT EXISTS admin_approvals (
     FOREIGN KEY (creator_id) REFERENCES users(id),
     FOREIGN KEY (admin_id) REFERENCES users(id)
   )`;
+
+const contentTable = `CREATE TABLE IF NOT EXISTS content (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    creator_id INT,
+    viewer_count INT DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
+  )`;
+
 
 const contentVideoTable = `CREATE TABLE IF NOT EXISTS content_videos (
   id INT AUTO_INCREMENT PRIMARY KEY,

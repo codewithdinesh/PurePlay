@@ -4,6 +4,7 @@ require("dotenv").config();
 const requiredSignin = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
+    
     const { _id, role, username, email } = await jwt.verify(
       token,
       process.env.JWT_SECRET

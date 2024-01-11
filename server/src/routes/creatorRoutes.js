@@ -44,6 +44,8 @@ const {
 
 // Define your API endpoints here
 router.get("/content/:content_id", requiredSignin, getContentDetails);
+
+// Upload Details of Video Content
 router.post(
   "/upload-content",
   requiredSignin,
@@ -52,6 +54,8 @@ router.post(
   isRequestValidated,
   uploadContent
 );
+
+// Upload Video of Video Content
 router.post(
   "/upload-video/:content_id",
   requiredSignin,
@@ -59,6 +63,7 @@ router.post(
   upload.single("video_file"),
   uploadVideo
 );
+
 router.post("/like/:content_id", requiredSignin, userMiddleware, likeContent);
 router.post(
   "/comment/:content_id",

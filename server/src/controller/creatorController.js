@@ -7,11 +7,14 @@ const uploadContent = async (req, res) => {
     const query =
       "INSERT INTO content (title, description, creator_id) VALUES (?,?,?)";
     const values = [title, description, creator_id];
-    await connection.query(query, values, async (err) => {
+    await connection.query(query, values, async (err, result) => {
       if (err) {
         console.error("Error in uploadContent:", err);
         return res.status(500).json({ message: "Internal server error." });
       }
+
+      console.log(result);
+
       return res.status(201).json({
         message: "Content uploaded successfully.",
       });
@@ -22,21 +25,37 @@ const uploadContent = async (req, res) => {
   }
 };
 
+// To Upload video, follow these steps:
+// 1) call api "/api/v1/upload-content"
+// Upload video contents into content table (title, description, creator_id)
+
+// 2) call api "/api/v1/upload-video/:content_id"
+// Upload video into video_libary table (video_url : path of uploaded video)
+// Upload video into content_videos table (user_id, content_id, video_id)
+
+
 const uploadVideo = async (req, res) => {
   try {
     const { content_id } = req.params;
     const { _id: user_id } = req.user;
     const { path } = req.file;
+
     const query = "INSERT INTO video_libary (video_url) VALUES (?)";
     const values = [path];
+
     await connection.query(query, values, async (err, result) => {
+
       if (err) {
         console.error("Error in uploadVideo:", err);
         return res.status(500).json({ message: "Internal server error." });
+
       } else if (result) {
+
         const contentVideoQuery =
           "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
+
         const contentVideoValues = [user_id, content_id, result.insertId];
+
         await connection.query(
           contentVideoQuery,
           contentVideoValues,
@@ -53,6 +72,7 @@ const uploadVideo = async (req, res) => {
             }
           }
         );
+
       }
     });
   } catch (error) {
