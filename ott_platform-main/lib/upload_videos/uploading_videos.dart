@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
- import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ott_platform_app/model/UserData.dart';
+import 'package:ott_platform_app/services/auth_service.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -90,9 +92,8 @@ import 'package:path/path.dart' as path;
 // }
 // class VideoUpload {
 //   var videoPath;
-  
-//   VideoUpload({required bearerToken});
 
+//   VideoUpload({required bearerToken});
 
 //   Future<void> uploadVideo() async {
 //     try {
@@ -155,93 +156,67 @@ class VideoUpload {
 
   VideoUpload();
 
-  Future<String> generateBearerToken() async {
+  Future<void> uploadVideo() async {
     try {
-      final authResponse = await http.post(
-        Uri.parse("http://10.0.2.2:3000/auth/v1/signin"),
+      // fetching auth token from the AuthServices
+
+      AuthServices authServices = AuthServices();
+
+      var userToken = await authServices.getUserToken();
+
+      print("Bearer Token from AuthServices : $userToken");
+
+      // User data
+      UserData? user = await authServices.getUser();
+
+      // Step 1: Call "/api/v1/upload-content" with Bearer token
+
+      final contentRequest = await http.post(
+        Uri.parse("$uri/api/v1/upload-content"),
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $bearerToken',
+          HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
+        },
         body: {
-          // "username": "karthick",
-          "email":"test@gmail.com",
-           "password": "test",
+          "title": "Video Title",
+          "description": "Video Description",
+          "creator_id": user?.id, //
         },
       );
 
-     final dynamic responseData = jsonDecode(authResponse.body);
-print("Auth response: $responseData");
+      final contentResponse = jsonDecode(contentRequest.body);
 
-final authToken = responseData['token'];
+      final msg = contentResponse['message'];
+      final content_id = contentResponse['content_id'];
 
-
-      if (authToken != null) {
-        // Save the token to SharedPreferences
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        prefs.setString('bearerToken', authToken);
-
-        // Set the token in the class variable
-        bearerToken = authToken;
-
-        return authToken; // Return the generated token
-      } else {
-        print("Error generating bearer token: No access token in the response");
-        return ''; // Handle the case where no token is generated
-      }
-    } catch (e) {
-      print("Error generating bearer token: $e");
-      return ''; // Handle the error case
-    }
-  }
-
-  Future<void> uploadVideo() async {
-    try {
-      // Step 1: Call "/api/v1/upload-content" with Bearer token
-      print("Bearer Token: $bearerToken");
-
-final contentResponse = await http.post(
-  Uri.parse("http://10.0.2.2:3000/api/v1/upload-content"),
-  headers: {
-    HttpHeaders.authorizationHeader: 'Bearer $bearerToken',
-    HttpHeaders.contentTypeHeader: 'application/x-www-form-urlencoded',
-  },
-  body: {
-    "title": "Video Title",
-    "description": "Video Description",
-    "creator_id": '7',// replace with actual creator ID
-  },
-);
-
-
-      const content_id = 5;
-
+      print("Content Response: $contentResponse");
 
       // Step 2: Call "/api/v1/upload-video/:content_id" with Bearer token
-      
-  final request = http.MultipartRequest(
-    'POST',
-    Uri.parse("http://10.0.2.2:3000/api/v1/upload-video/$content_id"),
-  );
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse("$uri/api/v1/upload-video/$content_id"),
+      );
 
-  // Add headers
-  request.headers.addAll({
-    HttpHeaders.authorizationHeader: 'Bearer $bearerToken',
-  });
+      // Add headers
+      request.headers.addAll({
+        HttpHeaders.authorizationHeader: 'Bearer $userToken',
+      });
 
-  // Add video file
-  request.files.add(await http.MultipartFile.fromPath('video_file', videoPath));
+      // Add video file
+      request.files
+          .add(await http.MultipartFile.fromPath('video_file', videoPath));
 
-  // Send request
-  final response = await request.send();
+      // Send request
+      final response = await request.send();
 
-  // Check HTTP status code
- // Check HTTP status code
-if (response.statusCode == 201) {
-  final videoResponse = await http.Response.fromStream(response);
-  print("Video uploaded successfully: ${videoResponse.body}");
-} else {
-  print("Error uploading video. Status code: ${response.statusCode}");
-}
-
-    }
- catch (e) {
+      // Check HTTP status code
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final videoResponse = await http.Response.fromStream(response);
+        print("Video uploaded successfully: ${videoResponse.body}");
+      } else {
+        print("Error uploading video. Status code: ${response.statusCode}");
+      }
+    } catch (e) {
       print("Error uploading video: $e");
     }
   }
@@ -252,12 +227,8 @@ if (response.statusCode == 201) {
     if (result != null) {
       PlatformFile file = result.files.first;
       videoPath = file.path!;
-      print(videoPath);
 
-      // Check if bearer token is already generated, if not, generate it
-      if (bearerToken == null || bearerToken.isEmpty) {
-        bearerToken = await generateBearerToken();
-      }
+      print(videoPath);
 
       await uploadVideo();
     } else {
@@ -265,5 +236,3 @@ if (response.statusCode == 201) {
     }
   }
 }
-
-

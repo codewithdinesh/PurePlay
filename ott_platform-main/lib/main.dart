@@ -16,22 +16,21 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 void main() async {
- WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+    // await Firebase.initializeApp(
+    //   options: DefaultFirebaseOptions.currentPlatform,
+    // );
     runApp(const MyApp());
   } catch (e) {
     print('Error initializing Firebase: $e');
-    // Handle the error appropriately, e.g., show an error screen.
+
   }
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -43,17 +42,17 @@ class MyApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
       routes: {
-        '/registerview': (context) => RegisterView(),
-        '/creatorregisterview': (context) => CreatorRegisterView(),
-        '/maintabview': (context) => MainTabView(),
-        '/loginview': (context) => LoginView(),
-        '/usercreatorcardscreen': (context) => UserCreatorCardScreen(),
-        '/creatormaintabview': (context) => CreatorMainTabView(),
-        '/adminscreen': (context) => AdminScreen(),
-        '/creatorloginview': (context) => CreatorLoginView(),
-        '/adminloginview': (context) => AdminLoginView(),
-        '/adminmaintabview': (context) => AdminMainTabView(),
-        '/checkout': (context) => CheckoutOnePage(),
+        '/registerview': (context) => const RegisterView(),
+        '/creatorregisterview': (context) => const CreatorRegisterView(),
+        '/maintabview': (context) => const MainTabView(),
+        '/loginview': (context) => const LoginView(),
+        '/usercreatorcardscreen': (context) => const UserCreatorCardScreen(),
+        '/creatormaintabview': (context) => const CreatorMainTabView(),
+        '/adminscreen': (context) => const AdminScreen(),
+        '/creatorloginview': (context) => const CreatorLoginView(),
+        '/adminloginview': (context) => const AdminLoginView(),
+        '/adminmaintabview': (context) => const AdminMainTabView(),
+        '/checkout': (context) => const CheckoutOnePage(),
         '/videoListScreen': (context) =>
             VideoListScreen(context as List<String>),
       },

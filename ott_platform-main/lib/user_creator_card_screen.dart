@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ott_platform_app/common_widget/custom_button.dart';
+import 'package:ott_platform_app/common_widget/video_player.dart';
 import 'common/color_extension.dart';
 
 class UserCreatorCardScreen extends StatelessWidget {
@@ -14,6 +15,7 @@ class UserCreatorCardScreen extends StatelessWidget {
         child: Center(
           child: Column(
             children: [
+          
               const SizedBox(
                 height: 240,
               ),
@@ -37,8 +39,7 @@ class UserCreatorCardScreen extends StatelessWidget {
                         ),
                         child: const Text(
                           'User',
-                          style: TextStyle(
-                              fontSize: 17, color: Colors.white),
+                          style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
                       ),
                     ),
@@ -64,8 +65,7 @@ class UserCreatorCardScreen extends StatelessWidget {
                         ),
                         child: const Text(
                           'Creator',
-                          style: TextStyle(
-                              fontSize: 17, color: Colors.white),
+                          style: TextStyle(fontSize: 17, color: Colors.white),
                         ),
                       ),
                     ),
