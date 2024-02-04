@@ -21,6 +21,7 @@ const {
 router.post("/signup", SIGNUP_VALIDATOR, isRequestValidated, SignUp);
 router.post("/signin", LOGIN_VALIDATOR, isRequestValidated, SignIn);
 router.post("/profile", requiredSignin, Profile);
+
 router.get(
   "/approve-creator/:createId",
   requiredSignin,

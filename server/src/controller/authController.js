@@ -33,6 +33,44 @@ const getUserByUsername = (username) => {
   });
 };
 
+// search creator by username
+const searchCreatorByUsername = (req, res) => {
+  // get input username 
+  const username = req.query.username;
+
+  return new Promise(async (resolve, reject) => {
+    const query = "SELECT * FROM users WHERE username LIKE ? AND role = 'creator'";
+    const searchTerm = '%' + username + '%';
+    await connection.query(query, [searchTerm], (err, result) => {
+      if (err) {
+        // reject(err);
+
+        return res.status(500).json({ message: "Internal server error." });
+
+      } else {
+        // resolve(result);
+
+        // return only username, id , firstname, lastname
+
+
+        result = result.map((user) => {
+          return {
+            id: user.id,
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+          };
+        });
+
+        return res.status(200).json({ data: result });
+        // return res.status(200).json({ data: result });
+      }
+    });
+  });
+};
+
+
+
 const SignUp = async (req, res) => {
   try {
     // Get the user data from the request body
@@ -72,7 +110,7 @@ const SignUp = async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, salt);
-  
+
     // Create a new user in the MySQL database
     let insertUserQuery =
       "INSERT INTO users (firstName, lastName, email, password, username) VALUES (?, ?, ?, ?, ?)";
@@ -276,4 +314,5 @@ module.exports = {
   Profile,
   approveCreator,
   disapproveCreator,
+  searchCreatorByUsername,
 };

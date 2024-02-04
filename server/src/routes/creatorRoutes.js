@@ -11,6 +11,10 @@ const {
   rateProposal,
   updateRate,
 } = require("../controller/creatorController");
+
+
+const { searchCreatorByUsername } = require("../controller/authController");
+
 const {
   getLikesCount,
   getCommentArray,
@@ -28,22 +32,9 @@ const {
   userMiddleware,
 } = require("../common/middleware");
 
-//Define your API endpoints here
-router.post("/upload", upload.single("video_file"), (req, res) => {
-  //Access the uploaded file using req.file
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded." });
-  }
 
-  const videoPath = req.file.path;
 
-  // You can now save videoPath to the database or perform further actions
-  return res
-    .status(200)
-    .json({ message: "File uploaded successfully.", videoPath });
-});
 
-// Define your API endpoints here
 router.get("/content/:content_id", requiredSignin, getContentDetails);
 
 // Upload Details of Video Content
@@ -76,8 +67,16 @@ router.post(
 
 //   }
 // );
-router.post('/api/v1/upload-video/:content_id', upload.single('video_file'), uploadVideo);
+// router.post('/api/v1/upload-video/:content_id', upload.single('video_file'), uploadVideo);
 
+
+// colaboration
+router.post(
+  "/search-collaborator",
+  // requiredSignin,
+  // userMiddleware,
+  searchCreatorByUsername
+)
 
 
 router.post("/like/:content_id", requiredSignin, userMiddleware, likeContent);
