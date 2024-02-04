@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 // import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:ott_platform_app/common_widget/round_button.dart';
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
 import 'package:ott_platform_app/model/UserData.dart';
@@ -16,6 +17,8 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
 class VideoUploadScreen extends StatefulWidget {
+  const VideoUploadScreen({super.key});
+
   @override
   _VideoUploadScreenState createState() => _VideoUploadScreenState();
 }
@@ -75,7 +78,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
   void _pickVideo(ImageSource source) async {
     XFile? pickedFile = await ImagePicker()
-        .pickVideo(source: source, maxDuration: Duration(seconds: 60));
+        .pickVideo(source: source, maxDuration: const Duration(seconds: 60));
 
     if (pickedFile != null) {
       await _playVideo(pickedFile);
@@ -129,6 +132,8 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
           "creator_id": user?.id, //
         },
       );
+
+      print
 
       final contentResponse = jsonDecode(contentRequest.body);
 
@@ -205,6 +210,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
         allowMuting: true,
         allowPlaybackSpeedChanging: true,
         showOptions: true,
+        aspectRatio: 16 / 9,
 
         progressIndicatorDelay:
             bufferDelay != null ? Duration(milliseconds: bufferDelay!) : null,
@@ -238,45 +244,78 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            GestureDetector(
-              onTap: () {
-                _pickVideo(ImageSource.gallery);
-              },
-              child: Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8.0),
+            Stack(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    _pickVideo(ImageSource.gallery);
+                  },
+                  child: Container(
+                      height: 250,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: _videoFile == null
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.video_library, size: 40),
+                                  SizedBox(height: 8),
+                                  Text('Tap to select video'),
+                                ],
+                              ),
+                            )
+                          : Expanded(
+                              child: Center(
+                                child: _chewieController != null &&
+                                        _chewieController!.videoPlayerController
+                                            .value.isInitialized
+                                    ? Chewie(
+                                        controller: _chewieController!,
+                                      )
+                                    : const Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(height: 20),
+                                          Text('Loading'),
+                                        ],
+                                      ),
+                              ),
+                            )),
+                ),
+
+                // unselect video if video is selected
+
+                if (_videoFile != null)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _videoFile = null;
+                          _controller?.dispose();
+                          _chewieController?.dispose();
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.grey.withOpacity(0.5),
+                        ),
+                        padding: const EdgeInsets.all(8),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
-                  child: _videoFile == null
-                      ? const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.video_library, size: 40),
-                              SizedBox(height: 8),
-                              Text('Tap to select video'),
-                            ],
-                          ),
-                        )
-                      : Expanded(
-                          child: Center(
-                            child: _chewieController != null &&
-                                    _chewieController!.videoPlayerController
-                                        .value.isInitialized
-                                ? Chewie(
-                                    controller: _chewieController!,
-                                  )
-                                : const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircularProgressIndicator(),
-                                      SizedBox(height: 20),
-                                      Text('Loading'),
-                                    ],
-                                  ),
-                          ),
-                        )),
+              ],
             ),
 
             // Video Title
@@ -299,12 +338,14 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () async {
-                await uploadVideo();
-              },
-              child: const Text('Upload Video'),
-            ),
+
+            // Upload Video Button
+
+            RoundButton(
+                title: "Upload video",
+                onPressed: () async {
+                  await uploadVideo();
+                }),
           ],
         ),
       ),

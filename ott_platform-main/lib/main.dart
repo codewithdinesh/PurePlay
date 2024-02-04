@@ -13,6 +13,7 @@ import 'package:ott_platform_app/user_view/login/login_view.dart';
 import 'package:ott_platform_app/user_view/login/register_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'creator_view/upload/upload_video_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,7 +25,6 @@ void main() async {
     runApp(const MyApp());
   } catch (e) {
     print('Error initializing Firebase: $e');
-
   }
 }
 
@@ -40,7 +40,8 @@ class MyApp extends StatelessWidget {
         fontFamily: "Gotham",
         useMaterial3: true,
       ),
-      home: const SplashScreen(),
+      // home: const SplashScreen(),
+      home: const VideoUploadScreen(),
       routes: {
         '/registerview': (context) => const RegisterView(),
         '/creatorregisterview': (context) => const CreatorRegisterView(),
