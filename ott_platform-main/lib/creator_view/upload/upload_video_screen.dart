@@ -16,6 +16,8 @@ import 'package:video_player/video_player.dart';
 
 import 'package:chewie/chewie.dart';
 
+import 'dart:async';
+
 class VideoUploadScreen extends StatefulWidget {
   const VideoUploadScreen({super.key});
 
@@ -129,11 +131,11 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
         body: {
           "title": videoTitle,
           "description": videoDescription,
-          "creator_id": user?.id, //
+          "creator_id": user?.id.toString(), //
         },
       );
 
-      print
+      // print("Content Request: ${contentRequest.body}");
 
       final contentResponse = jsonDecode(contentRequest.body);
 
@@ -155,13 +157,15 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
       // Add video file
 
-      if (_videoFile != null && _videoFile!.path.isNotEmpty) {
-        request.files.add(
-            await http.MultipartFile.fromPath('video_file', _videoFile!.path));
-      }
+      // if (_videoFile != null && _videoFile!.path.isNotEmpty) {
+      //   request.files
+      //       .add(await http.MultipartFile.fromPath('video', _videoFile!.path));
+      // }
 
-      request.files.add(await http.MultipartFile.fromBytes(
-          "video", _videoFile!.readAsBytes() as List<int>));
+      // Working For Web
+      List<int> videoBytes = await _videoFile!.readAsBytes();
+      request.files.add(http.MultipartFile.fromBytes('video_file', videoBytes,
+          filename: 'video.mp4'));
 
       // Send request
       final response = await request.send();
@@ -172,9 +176,12 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
         print("Video uploaded successfully: ${videoResponse.body}");
       } else {
+        print("Error: ${response}");
         print("Error uploading video. Status code: ${response.statusCode}");
       }
     } catch (error) {
+      print("Error uploading video: $error");
+
       _uploadStatus = 'Error uploading video: $error';
     } finally {
       setState(() {
@@ -251,41 +258,39 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                     _pickVideo(ImageSource.gallery);
                   },
                   child: Container(
-                      height: 250,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: _videoFile == null
-                          ? const Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.video_library, size: 40),
-                                  SizedBox(height: 8),
-                                  Text('Tap to select video'),
-                                ],
-                              ),
-                            )
-                          : Expanded(
-                              child: Center(
-                                child: _chewieController != null &&
-                                        _chewieController!.videoPlayerController
-                                            .value.isInitialized
-                                    ? Chewie(
-                                        controller: _chewieController!,
-                                      )
-                                    : const Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          CircularProgressIndicator(),
-                                          SizedBox(height: 20),
-                                          Text('Loading'),
-                                        ],
-                                      ),
-                              ),
-                            )),
+                    height: 250,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: _videoFile == null
+                        ? const Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.video_library, size: 40),
+                                SizedBox(height: 8),
+                                Text('Tap to select video'),
+                              ],
+                            ),
+                          )
+                        : Center(
+                            child: _chewieController != null &&
+                                    _chewieController!.videoPlayerController
+                                        .value.isInitialized
+                                ? Chewie(
+                                    controller: _chewieController!,
+                                  )
+                                : const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      CircularProgressIndicator(),
+                                      SizedBox(height: 20),
+                                      Text('Loading'),
+                                    ],
+                                  ),
+                          ),
+                  ),
                 ),
 
                 // unselect video if video is selected

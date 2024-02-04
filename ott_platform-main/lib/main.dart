@@ -40,8 +40,8 @@ class MyApp extends StatelessWidget {
         fontFamily: "Gotham",
         useMaterial3: true,
       ),
-      // home: const SplashScreen(),
-      home: const VideoUploadScreen(),
+      home: const SplashScreen(),
+      // home: const VideoUploadScreen(),
       routes: {
         '/registerview': (context) => const RegisterView(),
         '/creatorregisterview': (context) => const CreatorRegisterView(),
