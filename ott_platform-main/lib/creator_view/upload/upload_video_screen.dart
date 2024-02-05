@@ -4,12 +4,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-// import 'package:file_picker/file_picker.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+
 import 'package:ott_platform_app/common_widget/round_button.dart';
 import 'package:ott_platform_app/global.dart';
-import 'package:ott_platform_app/google_auth.dart';
+
 import 'package:ott_platform_app/model/UserData.dart';
 import 'package:ott_platform_app/services/auth_service.dart';
 import 'package:video_player/video_player.dart';
@@ -17,6 +18,10 @@ import 'package:video_player/video_player.dart';
 import 'package:chewie/chewie.dart';
 
 import 'dart:async';
+
+import '../../utils/snackbar.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class VideoUploadScreen extends StatefulWidget {
   const VideoUploadScreen({super.key});
@@ -95,8 +100,20 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
   Future<void> uploadVideo() async {
     try {
+      // print("File -- ${File(_videoFile!.path).absolute.path}");
+      print("File Path -- ${File(_videoFile!.path).uri}");
+
       if (_videoFile == null) {
         _uploadStatus = 'Please select a video first.';
+        showSnackBar(context, "Please select a video first.", isError: true);
+        return;
+      } else if (_titleController.text.isEmpty) {
+        _uploadStatus = 'Please enter a title.';
+        showSnackBar(context, "Please enter a title.", isError: true);
+        return;
+      } else if (_descriptionController.text.isEmpty) {
+        _uploadStatus = 'Please enter a description.';
+        showSnackBar(context, "Please enter a description.", isError: true);
         return;
       }
 
@@ -114,6 +131,11 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       AuthServices authServices = AuthServices();
 
       var userToken = await authServices.getUserToken();
+
+      if (userToken == null) {
+        showSnackBar(context, "User Token is null", isError: true);
+        return;
+      }
 
       print("Bearer Token from AuthServices : $userToken");
 
@@ -158,31 +180,56 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       // Add video file
 
       // if (_videoFile != null && _videoFile!.path.isNotEmpty) {
-      //   request.files
-      //       .add(await http.MultipartFile.fromPath('video', _videoFile!.path));
+      //   request.files.add(await http.MultipartFile.fromPath(
+      //       'video', File(_videoFile!.path) as String));
       // }
 
       // Working For Web
       List<int> videoBytes = await _videoFile!.readAsBytes();
+      final String? mimeType =
+          lookupMimeType(_videoFile!.path, headerBytes: videoBytes);
+
+      print("Video Type: $mimeType");
+
       request.files.add(http.MultipartFile.fromBytes('video_file', videoBytes,
-          filename: 'video.mp4'));
+          filename: 'video.mp4', contentType: MediaType.parse(mimeType!)));
 
       // Send request
       final response = await request.send();
 
-      // Check HTTP status code
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        final videoResponse = await http.Response.fromStream(response);
+      final totalBytes = response.contentLength ?? -1;
+      int uploadedBytes = 0;
 
-        print("Video uploaded successfully: ${videoResponse.body}");
-      } else {
-        print("Error: ${response}");
-        print("Error uploading video. Status code: ${response.statusCode}");
-      }
+      response.stream.listen(
+        (List<int> chunk) {
+          uploadedBytes += chunk.length;
+          setState(() {
+            _uploadProgress = uploadedBytes / totalBytes;
+          });
+        },
+        onDone: () async {
+          // Check HTTP status code
+          if (response.statusCode == 201 || response.statusCode == 200) {
+            final videoResponse = await http.Response.fromStream(response);
+            print("Video uploaded successfully: ${videoResponse.body}");
+            showSnackBar(context, "Video uploaded successfully");
+          } else {
+            print("Error: ${response}");
+            showSnackBar(context, "Error uploading video", isError: true);
+          }
+        },
+        onError: (error) {
+          print("Error uploading video: $error");
+          showSnackBar(context, "Error uploading video", isError: true);
+        },
+        cancelOnError: true,
+      );
     } catch (error) {
       print("Error uploading video: $error");
 
       _uploadStatus = 'Error uploading video: $error';
+
+      showSnackBar(context, "Error uploading video", isError: true);
     } finally {
       setState(() {
         _uploading = false;
@@ -343,6 +390,17 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
               ),
             ),
             const SizedBox(height: 16.0),
+
+            // show loading if video is uploading
+            // show uploading status
+            if (_uploadProgress > 0)
+              Column(
+                children: [
+                  LinearProgressIndicator(value: _uploadProgress),
+                  const SizedBox(height: 8),
+                  Text('Uploading $_uploadProgress / 100'),
+                ],
+              ),
 
             // Upload Video Button
 

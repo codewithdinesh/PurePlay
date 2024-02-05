@@ -1,5 +1,5 @@
 const { connection } = require("../config/db");
-const mysql = require('mysql2/promise'); 
+const mysql = require('mysql2/promise');
 const config = {
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
@@ -50,6 +50,7 @@ const uploadVideo = async (req, res) => {
   const { _id: user_id } = req.user;
   const { path } = req.file;
 
+
   try {
     // Validate content_id to ensure it is a valid numeric identifier
     if (isNaN(content_id)) {
@@ -87,7 +88,7 @@ const uploadVideo = async (req, res) => {
       // Associate video with specific content in the content_videos table
       const contentVideoQuery =
         "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
-        const contentVideoValues = [user_id, parseInt(content_id), video_id];
+      const contentVideoValues = [user_id, parseInt(content_id), video_id];
 
 
       const contentVideoResult = await connection.query(

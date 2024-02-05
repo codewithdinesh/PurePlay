@@ -55,6 +55,7 @@ dependencies:
   cloud_firestore: 4.15.2
   chewie: ^1.7.5
   fbroadcast: ^2.0.0
+  mime_type: ^1.0.0
   
 dev_dependencies:
   flutter_test:
