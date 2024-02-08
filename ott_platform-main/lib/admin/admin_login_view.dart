@@ -115,7 +115,7 @@ class _AdminLoginViewState extends State<AdminLoginView> {
                   RoundButton(
                     title: "LOGIN",
                     onPressed: () {
-                      Navigator.pushNamed(context, '/VideoListScreen');
+                      Navigator.pushNamed(context, "/VideoListScreen");
                     },
                   ),
                 ],

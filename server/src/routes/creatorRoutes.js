@@ -1,5 +1,6 @@
 const express = require("express");
-const router = express.Router();
+const router = express.Router();// Adjust the path if needed
+
 const {
   uploadVideo,
   uploadContent,
@@ -27,20 +28,20 @@ const {
   userMiddleware,
 } = require("../common/middleware");
 
-// Define your API endpoints here
-// router.post("/upload", upload.single("video_file"), (req, res) => {
-//   // Access the uploaded file using req.file
-//   if (!req.file) {
-//     return res.status(400).json({ message: "No file uploaded." });
-//   }
+//Define your API endpoints here
+router.post("/upload", upload.single("video_file"), (req, res) => {
+  //Access the uploaded file using req.file
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded." });
+  }
 
-//   const videoPath = req.file.path;
+  const videoPath = req.file.path;
 
-//   // You can now save videoPath to the database or perform further actions
-//   return res
-//     .status(200)
-//     .json({ message: "File uploaded successfully.", videoPath });
-// });
+  // You can now save videoPath to the database or perform further actions
+  return res
+    .status(200)
+    .json({ message: "File uploaded successfully.", videoPath });
+});
 
 // Define your API endpoints here
 router.get("/content/:content_id", requiredSignin, getContentDetails);
@@ -55,7 +56,7 @@ router.post(
   uploadContent
 );
 
-// Upload Video of Video Content
+//Upload Video of Video Content
 router.post(
   "/upload-video/:content_id",
   requiredSignin,
@@ -63,6 +64,21 @@ router.post(
   upload.single("video_file"),
   uploadVideo
 );
+// router.post(
+//   "/upload-video/:content_id",
+//   requiredSignin,
+//   userMiddleware,
+//   upload.single("video_file"),
+//   async (req, res) => {
+//     // Validate req.params.content_id and req.file
+//     const contentId = req.params.content_id;
+//     const videoPath = req.file.path;
+
+//   }
+// );
+router.post('/api/v1/upload-video/:content_id', upload.single('video_file'), uploadVideo);
+
+
 
 router.post("/like/:content_id", requiredSignin, userMiddleware, likeContent);
 router.post(

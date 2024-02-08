@@ -49,7 +49,7 @@ class _CreatorLoginViewState extends State<CreatorLoginView> {
       // User is logged in, navigate to the main screen or perform other actions
 
       // TO-DO: Verify Token is valid or not with the backend
-      Navigate.toPageWithReplacement(context, const MainTabView());
+      Navigate.toPageWithReplacement(context, const CreatorMainTabView());
     }
   }
 

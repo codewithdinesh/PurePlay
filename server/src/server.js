@@ -50,6 +50,6 @@ app.use("/auth/v1", [authRoutes]);
 //Routes
 app.use("/api/v1", [creatorRoutes, walletRoutes, subscriptionRoutes]);
 
-app.listen(3000 || process.env.PORT, () => {
+app.listen(3000|| process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });
