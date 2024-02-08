@@ -72,7 +72,7 @@ router.post(
 
 // colaboration
 router.post(
-  "/search-collaborator",
+  "/collaborators",
   // requiredSignin,
   // userMiddleware,
   searchCreatorByUsername
