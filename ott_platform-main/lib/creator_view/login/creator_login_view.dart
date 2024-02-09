@@ -44,12 +44,27 @@ class _CreatorLoginViewState extends State<CreatorLoginView> {
     AuthServices authServices = AuthServices();
     String? userToken = await authServices.getUserToken();
 
+    UserData? user = await authServices.getUser();
+
+    print('User Data: ${user?.toJson().toString()}');
+
     if (userToken != null) {
       print('User is logged in with token: $userToken');
       // User is logged in, navigate to the main screen or perform other actions
 
-      // TO-DO: Verify Token is valid or not with the backend
-      Navigate.toPageWithReplacement(context, const MainTabView());
+      String userType = user!.role;
+
+      if (userType == 'creator') {
+        // TO-DO: Verify Token is valid or not with the backend
+        Navigate.toPageWithReplacement(context, const CreatorMainTabView());
+      }
+
+      // If user is not a creator, then logout the user
+      else {
+        await authServices.deleteUserToken();
+        await authServices.deleteUser();
+        showSnackBar(context, "Please login as a creator.", isError: true);
+      }
     }
   }
 
@@ -98,12 +113,13 @@ class _CreatorLoginViewState extends State<CreatorLoginView> {
 
         await AuthServices().saveUserToken(userToken);
 
+        // Store User Data in the Google AUth Secure Storage
+        await AuthServices().saveUser(user);
+
         // Navigate to the main tab view after successful login
         // Navigate.toPageWithReplacement(context, const CreatorMainTabView());
 
         Navigator.pushNamed(context, '/creatormaintabview');
-
-
       } else if (res.statusCode == 401 ||
           res.statusCode == 404 ||
           res.statusCode == 500 ||

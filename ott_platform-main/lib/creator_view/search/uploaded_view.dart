@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ott_platform_app/upload_videos/uploading_videos.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/round_text_field.dart';
+import '../upload/upload_video_screen.dart';
 
 class UploadedView extends StatefulWidget {
   const UploadedView({super.key});
@@ -12,7 +13,7 @@ class UploadedView extends StatefulWidget {
 }
 
 class _UploadedViewState extends State<UploadedView> {
-  final uploadVideo = videoUpload();
+
   TextEditingController txtSearch = TextEditingController();
   List searchArr = [
     {
@@ -67,7 +68,11 @@ class _UploadedViewState extends State<UploadedView> {
           ),
           OutlinedButton(
               onPressed: () {
-                uploadVideo.selectVideo(context);
+                // uploadVideo.selectVideo(context);
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => VideoUploadScreen()));
               },
               child: Text("upload video")),
           Expanded(

@@ -4,6 +4,8 @@ const uploadContent = async (req, res) => {
   try {
     const { title, description } = req.body;
     const { _id: creator_id } = req.user;
+
+    // Insert into video details into content table
     const query =
       "INSERT INTO content (title, description, creator_id) VALUES (?,?,?)";
     const values = [title, description, creator_id];
@@ -13,10 +15,11 @@ const uploadContent = async (req, res) => {
         return res.status(500).json({ message: "Internal server error." });
       }
 
-      console.log(result);
+      // console.log(result);
 
       return res.status(201).json({
         message: "Content uploaded successfully.",
+        content_id: result.insertId,
       });
     });
   } catch (error) {
@@ -51,6 +54,7 @@ const uploadVideo = async (req, res) => {
 
       } else if (result) {
 
+        // Insert into content_videos table
         const contentVideoQuery =
           "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
 

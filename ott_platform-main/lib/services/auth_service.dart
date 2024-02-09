@@ -21,6 +21,25 @@ class AuthServices {
     await _secureStorage.write(key: 'user_data', value: userJson);
   }
 
+  Future<void> deleteUser() async {
+    await _secureStorage.delete(key: 'user_data');
+  }
+
+  // User is Admin, user or creator
+  Future<String?> getUserType() async {
+    try {
+      final userDataString = await _secureStorage.read(key: 'user_data');
+      if (userDataString != null && userDataString.isNotEmpty) {
+        final Map<String, dynamic> userDataMap = jsonDecode(userDataString);
+        return userDataMap['userType'];
+      }
+      return null;
+    } catch (e) {
+      print("Error retrieving user data: $e");
+      return null;
+    }
+  }
+
   Future<UserData?> getUser() async {
     try {
       final userDataString = await _secureStorage.read(key: 'user_data');

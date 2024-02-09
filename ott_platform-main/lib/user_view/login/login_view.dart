@@ -7,6 +7,7 @@ import 'package:ott_platform_app/common_widget/round_button.dart';
 import 'package:ott_platform_app/common_widget/round_text_field.dart';
 import 'package:ott_platform_app/global.dart';
 import 'package:ott_platform_app/google_auth.dart';
+import 'package:ott_platform_app/model/UserData.dart';
 import 'package:ott_platform_app/services/auth_service.dart';
 import 'package:ott_platform_app/user_view/login/register_view.dart';
 import 'package:ott_platform_app/user_view/main_tab/main_tab_view.dart';
@@ -39,13 +40,25 @@ class _LoginViewState extends State<LoginView> {
   Future<void> checkUserLoginStatus() async {
     AuthServices authServices = AuthServices();
     String? userToken = await authServices.getUserToken();
+    UserData? user = await authServices.getUser();
 
     if (userToken != null) {
       print('User is logged in with token: $userToken');
       // User is logged in, navigate to the main screen or perform other actions
 
-      // TO-DO: Verify Token is valid or not with the backend
-      Navigate.toPageWithReplacement(context, const MainTabView());
+      String userType = user!.role;
+
+      if (userType == "user") {
+        //  TO-DO: Verify Token is valid or not with the backend
+        Navigate.toPageWithReplacement(context, const MainTabView());
+      }
+
+      // If not user then logout
+      else {
+        await authServices.deleteUserToken();
+        await authServices.deleteUser();
+        showSnackBar(context, "Please login again.", isError: true);
+      }
     }
   }
 
@@ -87,10 +100,14 @@ class _LoginViewState extends State<LoginView> {
 
         Map<String, dynamic> successResponse = jsonDecode(res!.body);
         String userToken = successResponse['token'];
+        UserData user = UserData.fromJson(successResponse['data']);
 
         // Store Login Token in the Google AUth Secure Storage
 
         await AuthServices().saveUserToken(userToken);
+
+        // Save other user details
+        await AuthServices().saveUser(user);
 
         // Navigate to the main tab view after successful login
         Navigate.toPageWithReplacement(context, const MainTabView());

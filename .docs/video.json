@@ -1,0 +1,13 @@
+{
+    "videoId": "AuthGenerated",
+    "title": "String",
+    "description": "String",
+    "released": "22 Jan 2016",
+    "genre": "Action, Adventure, Sci-Fi",
+    "videoUrl": "localhoost",
+    "rating": "5.2",
+    "likes": "100",
+    "creator": "CreatorID",
+    "uploaded_on": "2016-01-22T00:00:00.000Z",
+    "status": " pending, approved, rejected"
+}
