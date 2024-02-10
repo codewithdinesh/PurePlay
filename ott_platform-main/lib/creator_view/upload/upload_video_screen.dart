@@ -19,6 +19,7 @@ import 'package:chewie/chewie.dart';
 
 import 'dart:async';
 
+import '../../common_widget/round_text_field.dart';
 import '../../utils/snackbar.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
@@ -49,9 +50,21 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
   int? bufferDelay;
 
+  AuthServices authServices = AuthServices();
+
+  // list of collaborators
+  List<String> _collaborators = [];
+
+  // list of searched collaborators
+  List<String> _searchedCollaborators = [];
+
+  var userToken;
+
   @override
   void initState() {
     super.initState();
+
+    userToken = authServices.getUserToken();
   }
 
   // Future<void> _pickVideo() async {
@@ -83,6 +96,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
   //   }
   // }
 
+  // Pick Video from Gallery or Camera
   void _pickVideo(ImageSource source) async {
     XFile? pickedFile = await ImagePicker()
         .pickVideo(source: source, maxDuration: const Duration(seconds: 60));
@@ -98,6 +112,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
     }
   }
 
+  // Upload Video to the server
   Future<void> uploadVideo() async {
     try {
       // print("File -- ${File(_videoFile!.path).absolute.path}");
@@ -127,10 +142,6 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       String videoDescription = _descriptionController.text;
 
       // fetching auth token from the AuthServices
-
-      AuthServices authServices = AuthServices();
-
-      var userToken = await authServices.getUserToken();
 
       if (userToken == null) {
         showSnackBar(context, "User Token is null", isError: true);
@@ -234,6 +245,32 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       setState(() {
         _uploading = false;
       });
+    }
+  }
+
+  // Fetch collaborator list from the server based on the search query
+  Future<void> fetchCollaborators(String query) async {
+    final response = await http.post(
+      Uri.parse('$uri/api/v1/collaborators?search=$query'),
+      headers: {
+        HttpHeaders.authorizationHeader: 'Bearer $userToken',
+      },
+    );
+
+    print("Collaborators Response: ${response.body}");
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      final collaborators = jsonDecode(response.body);
+
+      print("Collaborators: $collaborators");
+
+      setState(() {
+        _searchedCollaborators = List<String>.from(collaborators);
+      });
+
+      print("Collaborators: $collaborators");
+    } else {
+      print("Error fetching collaborators: ${response.body}");
     }
   }
 
@@ -391,9 +428,62 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
             ),
             const SizedBox(height: 16.0),
 
+            // search and select collaborators
+            RoundTextField(
+              title: 'Search Collaborator',
+              hintText: 'Search Collaborator',
+              onChanged: (query) async {
+                if (query.isNotEmpty) {
+                  await fetchCollaborators(query);
+                }
+              },
+            ),
+
+            // show searched collaborators
+            if (_searchedCollaborators.isNotEmpty)
+              Container(
+                height: 100,
+                child: ListView.builder(
+                  itemCount: _searchedCollaborators.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(_searchedCollaborators[index]),
+                      onTap: () {
+                        setState(() {
+                          _collaborators.add(_searchedCollaborators[index]);
+                          _searchedCollaborators.clear();
+                        });
+                      },
+                    );
+                  },
+                ),
+              ),
+
+            // show selected collaborators
+            if (_collaborators.isNotEmpty)
+              Container(
+                height: 100,
+                child: ListView.builder(
+                  itemCount: _collaborators.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(_collaborators[index]),
+                      trailing: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _collaborators.removeAt(index);
+                          });
+                        },
+                        child: const Icon(Icons.close),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
             // show loading if video is uploading
             // show uploading status
-            if (_uploadProgress > 0)
+            if (_uploading || _uploadStatus.isNotEmpty)
               Column(
                 children: [
                   LinearProgressIndicator(value: _uploadProgress),

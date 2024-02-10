@@ -36,7 +36,7 @@ const getUserByUsername = (username) => {
 // search creator by username
 const searchCreatorByUsername = (req, res) => {
   // get input username 
-  const username = req.query.query;
+  const username = req.query.search;
 
   return new Promise(async (resolve, reject) => {
     const query = "SELECT * FROM users WHERE username LIKE ? AND role = 'creator'";
