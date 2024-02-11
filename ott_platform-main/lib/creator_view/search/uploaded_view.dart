@@ -67,15 +67,31 @@ class _UploadedViewState extends State<UploadedView> {
           const SizedBox(
             height: 10,
           ),
-          OutlinedButton(
-              onPressed: () async {
-                // await uploadVideo.selectVideo();
-                Navigator.push(
+
+          // upload video button
+
+          
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+            child: Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              child: OutlinedButton.icon(
+                onPressed: () async {
+                  // await uploadVideo.selectVideo();
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => VideoUploadScreen()));
-              },
-              child: Text("upload video")),
+                      builder: (context) => const VideoUploadScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.upload),
+                label: const Text("Upload Video"),
+              ),
+            ),
+          ),
+
+     
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.symmetric(vertical: 15),

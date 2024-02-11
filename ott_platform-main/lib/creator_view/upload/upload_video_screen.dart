@@ -12,6 +12,7 @@ import 'package:ott_platform_app/common_widget/round_button.dart';
 import 'package:ott_platform_app/global.dart';
 
 import 'package:ott_platform_app/model/UserData.dart';
+import 'package:ott_platform_app/model/collaborator.dart';
 import 'package:ott_platform_app/services/auth_service.dart';
 import 'package:video_player/video_player.dart';
 
@@ -56,7 +57,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
   List<String> _collaborators = [];
 
   // list of searched collaborators
-  List<String> _searchedCollaborators = [];
+  List<Collaborator> _searchedCollaborators = [];
 
   var userToken;
 
@@ -260,12 +261,12 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
     print("Collaborators Response: ${response.body}");
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      final collaborators = jsonDecode(response.body);
+      final collaborators = jsonDecode(response.body)["data"];
 
       print("Collaborators: $collaborators");
 
       setState(() {
-        _searchedCollaborators = List<String>.from(collaborators);
+        _searchedCollaborators = Collaborator.fromJsonList(collaborators);
       });
 
       print("Collaborators: $collaborators");
@@ -330,176 +331,181 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       appBar: AppBar(
         title: const Text('Video Upload'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Stack(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    _pickVideo(ImageSource.gallery);
-                  },
-                  child: Container(
-                    height: 250,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: _videoFile == null
-                        ? const Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.video_library, size: 40),
-                                SizedBox(height: 8),
-                                Text('Tap to select video'),
-                              ],
-                            ),
-                          )
-                        : Center(
-                            child: _chewieController != null &&
-                                    _chewieController!.videoPlayerController
-                                        .value.isInitialized
-                                ? Chewie(
-                                    controller: _chewieController!,
-                                  )
-                                : const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      CircularProgressIndicator(),
-                                      SizedBox(height: 20),
-                                      Text('Loading'),
-                                    ],
-                                  ),
-                          ),
-                  ),
-                ),
-
-                // unselect video if video is selected
-
-                if (_videoFile != null)
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _videoFile = null;
-                          _controller?.dispose();
-                          _chewieController?.dispose();
-                        });
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                        ),
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      _pickVideo(ImageSource.gallery);
+                    },
+                    child: Container(
+                      height: 250,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
+                      child: _videoFile == null
+                          ? const Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.video_library, size: 40),
+                                  SizedBox(height: 8),
+                                  Text('Tap to select video'),
+                                ],
+                              ),
+                            )
+                          : Center(
+                              child: _chewieController != null &&
+                                      _chewieController!.videoPlayerController
+                                          .value.isInitialized
+                                  ? Chewie(
+                                      controller: _chewieController!,
+                                    )
+                                  : const Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        CircularProgressIndicator(),
+                                        SizedBox(height: 20),
+                                        Text('Loading'),
+                                      ],
+                                    ),
+                            ),
                     ),
                   ),
-              ],
-            ),
 
-            // Video Title
-            const SizedBox(height: 16.0),
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Title',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
+                  // unselect video if video is selected
 
-            // video Description
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-
-            // search and select collaborators
-            RoundTextField(
-              title: 'Search Collaborator',
-              hintText: 'Search Collaborator',
-              onChanged: (query) async {
-                if (query.isNotEmpty) {
-                  await fetchCollaborators(query);
-                }
-              },
-            ),
-
-            // show searched collaborators
-            if (_searchedCollaborators.isNotEmpty)
-              Container(
-                height: 100,
-                child: ListView.builder(
-                  itemCount: _searchedCollaborators.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_searchedCollaborators[index]),
-                      onTap: () {
-                        setState(() {
-                          _collaborators.add(_searchedCollaborators[index]);
-                          _searchedCollaborators.clear();
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
-
-            // show selected collaborators
-            if (_collaborators.isNotEmpty)
-              Container(
-                height: 100,
-                child: ListView.builder(
-                  itemCount: _collaborators.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      title: Text(_collaborators[index]),
-                      trailing: GestureDetector(
+                  if (_videoFile != null)
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: GestureDetector(
                         onTap: () {
                           setState(() {
-                            _collaborators.removeAt(index);
+                            _videoFile = null;
+                            _controller?.dispose();
+                            _chewieController?.dispose();
                           });
                         },
-                        child: const Icon(Icons.close),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey.withOpacity(0.5),
+                          ),
+                          padding: const EdgeInsets.all(8),
+                          child: const Icon(
+                            Icons.close,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
-                    );
-                  },
-                ),
-              ),
-
-            // show loading if video is uploading
-            // show uploading status
-            if (_uploading || _uploadStatus.isNotEmpty)
-              Column(
-                children: [
-                  LinearProgressIndicator(value: _uploadProgress),
-                  const SizedBox(height: 8),
-                  Text('Uploading $_uploadProgress / 100'),
+                    ),
                 ],
               ),
 
-            // Upload Video Button
+              // Video Title
+              const SizedBox(height: 16.0),
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16.0),
 
-            RoundButton(
-                title: "Upload video",
-                onPressed: () async {
-                  await uploadVideo();
-                }),
-          ],
+              // video Description
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+
+              // search and select collaborators
+              RoundTextField(
+                title: 'Search Collaborator',
+                hintText: 'Search Collaborator',
+                onChanged: (query) async {
+                  if (query.isNotEmpty) {
+                    await fetchCollaborators(query);
+                  }
+                },
+              ),
+
+              // show searched collaborators
+              if (_searchedCollaborators.isNotEmpty)
+                Container(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: _searchedCollaborators.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_searchedCollaborators[index].username),
+                        onTap: () {
+                          setState(() {
+                            _collaborators
+                                .add(_searchedCollaborators[index].username);
+                            _searchedCollaborators.clear();
+                          });
+                        },
+                      );
+                    },
+                  ),
+                ),
+
+              // show selected collaborators
+              if (_collaborators.isNotEmpty)
+                Container(
+                  height: 100,
+                  child: ListView.builder(
+                    itemCount: _collaborators.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(_collaborators[index]),
+                        trailing: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _collaborators.removeAt(index);
+                            });
+                          },
+                          child: const Icon(Icons.close),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+              // show loading if video is uploading
+              // show uploading status
+              if (_uploading || _uploadStatus.isNotEmpty)
+                Column(
+                  children: [
+                    LinearProgressIndicator(value: _uploadProgress),
+                    const SizedBox(height: 8),
+                    Text('Uploading $_uploadProgress / 100'),
+                  ],
+                ),
+
+              // Upload Video Button
+
+              RoundButton(
+                  title: "Upload video",
+                  onPressed: () async {
+                    await uploadVideo();
+                  }),
+            ],
+          ),
         ),
       ),
     );

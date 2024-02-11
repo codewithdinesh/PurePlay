@@ -47,7 +47,7 @@ class _CreatorMainTabViewState extends State<CreatorMainTabView>
         CreatorProfileView(),
       ]),
       backgroundColor: TColor.bg,
-    /*  floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
         backgroundColor: TColor.primary1,
         onPressed: () {
           TColor.tModeDark = !TColor.tModeDark;
@@ -60,11 +60,11 @@ class _CreatorMainTabViewState extends State<CreatorMainTabView>
           TColor.tModeDark ? Icons.light_mode : Icons.dark_mode,
           color: TColor.text,
         ),
-      ),*/
+      ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color:Colors.black,
-          boxShadow: const [
+        decoration: const BoxDecoration(
+          color: Colors.black,
+          boxShadow: [
             BoxShadow(
               color: Colors.black12,
               blurRadius: 4,
@@ -92,23 +92,20 @@ class _CreatorMainTabViewState extends State<CreatorMainTabView>
                   fontSize: 8,
                   fontWeight: FontWeight.w700),
               tabs: [
-                Tab(
-                  text: "HOME",
-                  icon: Icon(
-                    Icons.home_outlined
-                  )
+                const Tab(text: "HOME", icon: Icon(Icons.home_outlined)),
+                const Tab(
+                  text: "EXPLORE",
+                  icon: Icon(Icons.explore),
                 ),
-                Tab(
-                  text: "Upload",
-                  icon: Icon(
-                    Icons.upload
-                  ),
+
+                // Upload
+                const Tab(
+                  text: "UPLOAD",
+                  icon: Icon(Icons.upload),
                 ),
-                Tab(
+                const Tab(
                   text: "PROFILE",
-                  icon: Icon(
-                    Icons.account_circle
-                  ),
+                  icon: Icon(Icons.account_circle),
                 ),
               ]),
         ),
