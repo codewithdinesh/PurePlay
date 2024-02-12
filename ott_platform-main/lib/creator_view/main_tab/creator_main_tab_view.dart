@@ -24,7 +24,7 @@ class _CreatorMainTabViewState extends State<CreatorMainTabView>
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller = TabController(length: 4, vsync: this);
+    controller = TabController(length: 3, vsync: this);
     controller?.addListener(() {
       selectTab = controller?.index ?? 0;
       if (mounted) {
@@ -91,19 +91,15 @@ class _CreatorMainTabViewState extends State<CreatorMainTabView>
                   color: TColor.primary2,
                   fontSize: 8,
                   fontWeight: FontWeight.w700),
-              tabs: [
-                const Tab(text: "HOME", icon: Icon(Icons.home_outlined)),
-                const Tab(
-                  text: "EXPLORE",
-                  icon: Icon(Icons.explore),
-                ),
+              tabs: const [
+                Tab(text: "HOME", icon: Icon(Icons.home_outlined)),
 
                 // Upload
-                const Tab(
+                Tab(
                   text: "UPLOAD",
                   icon: Icon(Icons.upload),
                 ),
-                const Tab(
+                Tab(
                   text: "PROFILE",
                   icon: Icon(Icons.account_circle),
                 ),
