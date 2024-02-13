@@ -13,7 +13,7 @@ class UploadedView extends StatefulWidget {
 }
 
 class _UploadedViewState extends State<UploadedView> {
-
+  late final VideoUpload uploadVideo;
   TextEditingController txtSearch = TextEditingController();
   List searchArr = [
     {
@@ -30,6 +30,7 @@ class _UploadedViewState extends State<UploadedView> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    uploadVideo = VideoUpload();
     FBroadcast.instance().register("change_mode", (value, callback) {
       if (mounted) {
         setState(() {});
@@ -63,12 +64,12 @@ class _UploadedViewState extends State<UploadedView> {
                   )),
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           OutlinedButton(
-              onPressed: () {
-                // uploadVideo.selectVideo(context);
+              onPressed: () async {
+                // await uploadVideo.selectVideo();
                 Navigator.push(
                     context,
                     MaterialPageRoute(

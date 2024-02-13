@@ -1,4 +1,12 @@
 const { connection } = require("../config/db");
+const mysql = require('mysql2/promise'); 
+const config = {
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+};
+
 
 const uploadContent = async (req, res) => {
   try {
@@ -6,6 +14,8 @@ const uploadContent = async (req, res) => {
     const { _id: creator_id } = req.user;
 
     // Insert into video details into content table
+    // const { title, description, creator_id } = req.body;
+
     const query =
       "INSERT INTO content (title, description, creator_id) VALUES (?,?,?)";
     const values = [title, description, creator_id];
@@ -35,55 +45,86 @@ const uploadContent = async (req, res) => {
 // 2) call api "/api/v1/upload-video/:content_id"
 // Upload video into video_libary table (video_url : path of uploaded video)
 // Upload video into content_videos table (user_id, content_id, video_id)
-
-
 const uploadVideo = async (req, res) => {
+  const { content_id } = req.params;
+  const { _id: user_id } = req.user;
+  const { path } = req.file;
+
   try {
-    const { content_id } = req.params;
-    const { _id: user_id } = req.user;
-    const { path } = req.file;
+    // Validate content_id to ensure it is a valid numeric identifier
+    if (isNaN(content_id)) {
+      console.error("Invalid content_id provided.");
+      return res.status(400).json({ message: "Invalid content_id." });
+    }
 
-    const query = "INSERT INTO video_libary (video_url) VALUES (?)";
-    const values = [path];
+    // Check if req.file is defined and has the expected properties
+    if (!req.file || !req.file.path) {
+      console.error("Invalid file provided.");
+      return res.status(400).json({ message: "Invalid file." });
+    }
 
-    await connection.query(query, values, async (err, result) => {
+    const connection = await mysql.createConnection(config);
 
-      if (err) {
-        console.error("Error in uploadVideo:", err);
-        return res.status(500).json({ message: "Internal server error." });
+    try {
+      await connection.beginTransaction();
 
-      } else if (result) {
+      // Insert video information into the video_library table
+      const videoQuery = "INSERT INTO video_libary (video_url) VALUES (?)";
+      const videoValues = [path];
 
-        // Insert into content_videos table
-        const contentVideoQuery =
-          "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
+      const videoResult = await connection.query(videoQuery, videoValues);
 
-        const contentVideoValues = [user_id, content_id, result.insertId];
+      console.log("Video Insert Result:", videoResult);
 
-        await connection.query(
-          contentVideoQuery,
-          contentVideoValues,
-          (err, result) => {
-            if (err) {
-              console.error("Error in uploadVideo:", err);
-              return res.status(500).json({
-                message: "Internal server error.",
-              });
-            } else if (result) {
-              return res.status(201).json({
-                message: "Video uploaded successfully.",
-              });
-            }
-          }
-        );
-
+      if (videoResult.affectedRows === 0 || videoResult.insertId === 0) {
+        throw new Error("Error inserting video information.");
       }
-    });
+
+      const video_id = videoResult.insertId || videoResult[0]?.insertId;
+
+      console.log("Video ID:", video_id);
+
+      // Associate video with specific content in the content_videos table
+      const contentVideoQuery =
+        "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
+        const contentVideoValues = [user_id, parseInt(content_id), video_id];
+
+
+      const contentVideoResult = await connection.query(
+        contentVideoQuery,
+        contentVideoValues
+      );
+
+      console.log("Content Video Insert Result:", contentVideoResult);
+
+      if (contentVideoResult.affectedRows === 0) {
+        throw new Error("Error associating video with content.");
+      }
+
+      await connection.commit();
+
+      return res.status(201).json({
+        message: "Video uploaded successfully.",
+        data: {
+          videoId: video_id,
+          contentId: content_id,
+          userId: user_id,
+        },
+      });
+    } catch (error) {
+      await connection.rollback();
+      console.error("Transaction failed:", error);
+      return res.status(500).json({ message: "Internal server error." });
+    } finally {
+      await connection.end();
+    }
   } catch (error) {
     console.error("Error in uploadVideo:", error);
     return res.status(500).json({ message: "Internal server error." });
   }
 };
+
+
 
 const likeContent = async (req, res) => {
   try {
