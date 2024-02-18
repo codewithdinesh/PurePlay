@@ -35,6 +35,7 @@ const uploadContent = async (req, res) => {
 
 
 const uploadVideo = async (req, res) => {
+<<<<<<< HEAD
   const { content_id } = req.params;
   const { _id: user_id } = req.user;
   const { path } = req.file;
@@ -112,6 +113,54 @@ const uploadVideo = async (req, res) => {
     await connection.end();
   }
 }
+=======
+  try {
+    const { content_id } = req.params;
+    const { _id: user_id } = req.user;
+    const { path } = req.file;
+
+    const query = "INSERT INTO video_libary (video_url) VALUES (?)";
+    const values = [path];
+
+    await connection.query(query, values, async (err, result) => {
+
+      if (err) {
+        console.error("Error in uploadVideo:", err);
+        return res.status(500).json({ message: "Internal server error." });
+
+      } else if (result) {
+
+        const contentVideoQuery =
+          "INSERT INTO content_videos (user_id, content_id, video_id) VALUES (?, ?, ?)";
+
+        const contentVideoValues = [user_id, content_id, result.insertId];
+
+        await connection.query(
+          contentVideoQuery,
+          contentVideoValues,
+          (err, result) => {
+            if (err) {
+              console.error("Error in uploadVideo:", err);
+              return res.status(500).json({
+                message: "Internal server error.",
+              });
+            } else if (result) {
+              return res.status(201).json({
+                message: "Video uploaded successfully.",
+              });
+            }
+          }
+        );
+
+      }
+    });
+  } catch (error) {
+    console.error("Error in uploadVideo:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+>>>>>>> 5a20d614920bc9d8cf83f29d0253b9eb61bae9ab
 const likeContent = async (req, res) => {
   try {
     const { content_id } = req.params;
@@ -294,7 +343,10 @@ const updateRate = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a20d614920bc9d8cf83f29d0253b9eb61bae9ab
 module.exports = {
   getContentDetails,
   uploadContent,
