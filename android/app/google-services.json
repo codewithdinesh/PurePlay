@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "981606975474",
+    "project_id": "visankabackend",
+    "storage_bucket": "visankabackend.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981606975474:android:5fde530e442bf208164d6b",
+        "android_client_info": {
+          "package_name": "com.example.ott_platform_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "981606975474-ghdarr20fj8eed4ju703l2b9ul03fb59.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ott_platform_app",
+            "certificate_hash": "bb1c09a5cb588d31f3c21b3fa6e332d1eea3fe66"
+          }
+        },
+        {
+          "client_id": "981606975474-ivk3g6kcu35qd8hbndijgdf50la2htm2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBKKwZ9F4IYyndJ142zg50v_orSqiYdou8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981606975474-ivk3g6kcu35qd8hbndijgdf50la2htm2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "981606975474-2s8gk7k9108imljr6ttdsqukml4cn5mf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ottPlatformApp.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
