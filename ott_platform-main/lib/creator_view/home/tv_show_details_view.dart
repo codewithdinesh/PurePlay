@@ -5,7 +5,6 @@ import 'package:ott_platform_app/common/color_extension.dart';
 import 'package:ott_platform_app/common_widget/video.dart';
 
 import '../../../../../../../common_widget/round_button.dart';
-import '../../../../../cast_details_view.dart';
 
 class TvShowDetailsView extends StatefulWidget {
   const TvShowDetailsView({super.key});

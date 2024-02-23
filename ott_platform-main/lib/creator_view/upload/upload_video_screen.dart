@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -20,10 +21,13 @@ import 'package:chewie/chewie.dart';
 
 import 'dart:async';
 
+import '../../common/color_extension.dart';
 import '../../common_widget/round_text_field.dart';
 import '../../utils/snackbar.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
+
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class VideoUploadScreen extends StatefulWidget {
   const VideoUploadScreen({super.key});
@@ -45,6 +49,33 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
   final ImagePicker _picker = ImagePicker();
 
+  // List of categories
+  final List<String> _categories = [
+    'Action',
+    'Adventure',
+    'Comedy',
+    'Drama',
+    'Horror',
+    'Mystery',
+    'Romance',
+    'Thriller',
+    'Sci-Fi',
+    'Fantasy',
+    'Animation',
+    'Documentary',
+    'Biography',
+    'Crime',
+    'Family',
+    'History',
+    'Music',
+    'Sport',
+    'War',
+    'Western',
+  ];
+
+  // Selected category
+  List<String> _selectedCategories = [];
+
   bool _uploading = false;
   double _uploadProgress = 0.0;
   String _uploadStatus = '';
@@ -54,18 +85,27 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
   AuthServices authServices = AuthServices();
 
   // list of collaborators
-  List<String> _collaborators = [];
+  final List<Collaborator> _collaborators = [];
 
   // list of searched collaborators
   List<Collaborator> _searchedCollaborators = [];
 
-  var userToken;
+  String? userToken = "";
+
+  Future<void> setUserToken() async {
+    AuthServices authServices = AuthServices();
+    String? userTokn = await authServices.getUserToken();
+    setState(() {
+      userToken = userTokn;
+    });
+    print("User Token: $userToken");
+  }
 
   @override
   void initState() {
+    setUserToken();
     super.initState();
-
-    userToken = authServices.getUserToken();
+    print("User Token1: $userToken");
   }
 
   // Future<void> _pickVideo() async {
@@ -154,6 +194,8 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       // User data
       UserData? user = await authServices.getUser();
 
+      print("User: $user");
+
       // Step 1: Call "/api/v1/upload-content" with Bearer token
 
       final contentRequest = await http.post(
@@ -177,6 +219,11 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       final content_id = contentResponse['content_id'];
 
       print("Content Response: $contentResponse");
+
+      if (msg) {
+        showSnackBar(context, msg, isError: true);
+        return;
+      }
 
       // Step 2: Call "/api/v1/upload-video/:content_id" with Bearer token
       final request = http.MultipartRequest(
@@ -224,9 +271,31 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
           if (response.statusCode == 201 || response.statusCode == 200) {
             final videoResponse = await http.Response.fromStream(response);
             print("Video uploaded successfully: ${videoResponse.body}");
+
+            _uploadStatus = 'Video uploaded successfully';
+
+            // add colaborators
+            // Step 3: Call "/api/v1/content-collabration/:content_id" with Bearer token
+
+            for (int index = 0; index < _collaborators.length; index++) {
+              final collabRequest = await http.post(
+                Uri.parse("$uri/api/v1/content-collabration/$content_id"),
+                headers: {
+                  HttpHeaders.authorizationHeader: 'Bearer $userToken',
+                  HttpHeaders.contentTypeHeader: 'application/json',
+                },
+                body: jsonEncode({
+                  "collaborator_id": _collaborators[index].id,
+                }),
+              );
+
+              print("Collab Response: ${collabRequest.body}");
+            }
+
             showSnackBar(context, "Video uploaded successfully");
           } else {
             print("Error: ${response}");
+
             showSnackBar(context, "Error uploading video", isError: true);
           }
         },
@@ -331,6 +400,20 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
       appBar: AppBar(
         title: const Text('Video Upload'),
       ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: TColor.primary1,
+        onPressed: () {
+          TColor.tModeDark = !TColor.tModeDark;
+          FBroadcast.instance().broadcast("change_mode");
+          if (mounted) {
+            setState(() {});
+          }
+        },
+        child: Icon(
+          TColor.tModeDark ? Icons.light_mode : Icons.dark_mode,
+          color: TColor.text,
+        ),
+      ),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Padding(
@@ -412,7 +495,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
               ),
 
               // Video Title
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 8.0),
               TextField(
                 controller: _titleController,
                 decoration: const InputDecoration(
@@ -420,7 +503,7 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 8.0),
 
               // video Description
               TextField(
@@ -430,7 +513,22 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 8.0),
+
+              // video category can choose multiple categories at time
+
+              MultiSelectDialogField(
+                title: const Text("Select Video Category"),
+                items: _categories
+                    .map((category) =>
+                        MultiSelectItem<String>(category, category))
+                    .toList(),
+                onConfirm: (List<String> values) {
+                  _selectedCategories = values;
+                },
+              ),
+
+              const SizedBox(height: 8.0),
 
               // search and select collaborators
               RoundTextField(
@@ -450,15 +548,35 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                   child: ListView.builder(
                     itemCount: _searchedCollaborators.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(_searchedCollaborators[index].username),
-                        onTap: () {
-                          setState(() {
-                            _collaborators
-                                .add(_searchedCollaborators[index].username);
-                            _searchedCollaborators.clear();
-                          });
-                        },
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          // boxShadow: [
+                          //   BoxShadow(
+                          //     color: Colors.grey.withOpacity(0.5),
+                          //     spreadRadius: 2,
+                          //     blurRadius: 5,
+                          //     offset: Offset(0, 3),
+                          //   ),
+                          // ],
+                          border: Border.all(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                        child: ListTile(
+                          title: Text(_searchedCollaborators[index].username),
+                          trailing: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _collaborators
+                                    .add(_searchedCollaborators[index]);
+                                _searchedCollaborators.clear();
+                              });
+                            },
+                            child: const Icon(Icons.add),
+                          ),
+                        ),
                       );
                     },
                   ),
@@ -472,7 +590,8 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                     itemCount: _collaborators.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(_collaborators[index]),
+                        style: ListTileStyle.list,
+                        title: Text(_collaborators[index].username),
                         trailing: GestureDetector(
                           onTap: () {
                             setState(() {
@@ -486,9 +605,10 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
                   ),
                 ),
 
+              const SizedBox(height: 8.0),
               // show loading if video is uploading
               // show uploading status
-              if (_uploading || _uploadStatus.isNotEmpty)
+              if (_uploading && _uploadStatus.isNotEmpty)
                 Column(
                   children: [
                     LinearProgressIndicator(value: _uploadProgress),
