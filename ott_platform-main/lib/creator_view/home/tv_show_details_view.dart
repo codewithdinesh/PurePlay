@@ -2,9 +2,10 @@ import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:ott_platform_app/common/color_extension.dart';
+import 'package:ott_platform_app/common_widget/video.dart';
 
-import '../../common_widget/round_button.dart';
-import 'cast_details_view.dart';
+import '../../../../../../../common_widget/round_button.dart';
+import '../../../../../cast_details_view.dart';
 
 class TvShowDetailsView extends StatefulWidget {
   const TvShowDetailsView({super.key});
@@ -115,7 +116,16 @@ class _TvShowDetailsViewState extends State<TvShowDetailsView> {
                       height: media.width * 0.8,
                       alignment: Alignment.center,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VideoPlayerWidget(
+                  videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
+                ),
+              ),
+            );
+                        },
                         child: Image.asset("assets/img/play-button.png",
                             width: 55, height: 55),
                       ),
@@ -244,11 +254,14 @@ class _TvShowDetailsViewState extends State<TvShowDetailsView> {
                     title: "WATCH NOW",
                     height: 40,
                     onPressed: () {
-                      //  Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //         builder: (context) =>
-                      //             const MainTabView()));
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => VideoPlayerWidget(
+                  videoUrl: 'https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4',
+                ),
+              ),
+            );
                     },
                   ),
                 ),
