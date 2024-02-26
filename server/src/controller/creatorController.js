@@ -12,6 +12,7 @@ const uploadContent = async (req, res) => {
   try {
     const { title, description } = req.body;
     const { _id: creator_id } = req.user;
+    const { category } = req.body;
 
     // Insert into video details into content table
     // const { title, description, creator_id } = req.body;
@@ -49,7 +50,6 @@ const uploadVideo = async (req, res) => {
   const { content_id } = req.params;
   const { _id: user_id } = req.user;
   const { path } = req.file;
-
 
   try {
     // Validate content_id to ensure it is a valid numeric identifier
@@ -125,7 +125,127 @@ const uploadVideo = async (req, res) => {
   }
 };
 
+const fetchVideos = async (req, res) => {
+  try {
+    const query = `
+    SELECT
+    c.id AS content_id,
+    c.title AS content_title,
+    c.description AS content_description,
+    c.creator_id,
+    u.username AS creator_username,
+    v.video_url
+    FROM
+        content c
+    JOIN
+        content_videos cv ON c.id = cv.content_id
+    JOIN
+        video_libary v ON cv.video_id = v.id
+    JOIN
+        users u ON c.creator_id = u.id
 
+
+    `;
+
+    connection.query(query, (error, results) => {
+      if (error) {
+        console.error('Error fetching video details:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+      }
+
+      return res.status(200).json(results);
+    });
+  } catch (error) {
+    console.error('Error in /api/v1/videos', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+
+const fetchvideo = async (req, res) => {
+  const { videoId } = req.params;
+
+  console.log('Video ID:', videoId);
+
+  try {
+    const query = `
+
+      SELECT
+        cv.id AS id,
+        c.id AS content_id,
+        c.title AS content_title,
+        c.description AS content_description,
+        c.creator_id,
+        u.username AS creator_username,
+        v.video_url
+      FROM
+        content c
+      JOIN
+        content_videos cv ON c.id = cv.content_id
+      JOIN
+        video_libary v ON cv.video_id = v.id
+      JOIN
+        users u ON c.creator_id = u.id
+      WHERE
+        cv.id = ?
+    `;
+
+    connection.query(query, [videoId], (error, results) => {
+      if (error) {
+        console.error('Error fetching video details:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+      }
+
+      if (results.length === 0) {
+        return res.status(404).json({ message: 'Video not found.' });
+      }
+
+      return res.status(200).json(results[0]);
+    });
+  } catch (error) {
+    console.error('Error in /api/v1/videos/:videoId', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
+
+
+const fetchVideosByCreatorId = async (req, res) => {
+  const { creatorId } = req.params;
+
+  try {
+    const query = `
+      SELECT
+        c.id AS content_id,
+        c.title AS content_title,
+        c.description AS content_description,
+        c.creator_id,
+        u.username AS creator_username,
+        v.video_url
+      FROM
+        content c
+      JOIN
+        content_videos cv ON c.id = cv.content_id
+      JOIN
+        video_libary v ON cv.video_id = v.id
+      JOIN
+        users u ON c.creator_id = u.id
+      WHERE
+        c.creator_id = ?
+    `;
+
+    connection.query(query, [creatorId], (error, results) => {
+      if (error) {
+        console.error('Error fetching videos:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+      }
+
+      return res.status(200).json(results);
+    });
+  } catch (error) {
+    console.error('Error in fetchVideosByCreatorId:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  }
+};
 
 
 const likeContent = async (req, res) => {
@@ -236,16 +356,20 @@ const creatorCollaborator = async (req, res) => {
     const { content_id } = req.params;
     const { _id: user_id } = req.user;
     const { collaborator_id } = req.body;
+
+    console.log("Collaborator ID:", collaborator_id);
     const query =
       "INSERT INTO creator_collaborations (creator_id, collaborator_id, content_id) VALUES (?,?,?)";
     const values = [user_id, Number(collaborator_id), Number(content_id)];
     await connection.query(query, values, (err, result) => {
-      if (err.code === "ER_DUP_ENTRY") {
-        return res.status(400).json({
-          message: "You have already added this collaborator.",
-        });
-      }
+
       if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          return res.status(400).json({
+            message: "You have already added this collaborator.",
+          });
+        }
+
         console.error("Error in creatorCollaborator:", err);
         return res.status(500).json({
           message: "Internal server error.",
@@ -314,9 +438,12 @@ module.exports = {
   getContentDetails,
   uploadContent,
   uploadVideo,
+  fetchVideos,
+  fetchvideo,
   likeContent,
   commentContent,
   creatorCollaborator,
   rateProposal,
   updateRate,
+  fetchVideosByCreatorId,
 };

@@ -52,6 +52,9 @@ const getContentDetails = async (req, res) => {
   }
 };
 
+// fetch
+
+
 const getCommentArray = async (req, res) => {
   try {
     const { content_id } = req.params;

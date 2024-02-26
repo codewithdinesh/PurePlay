@@ -10,6 +10,9 @@ const {
   creatorCollaborator,
   rateProposal,
   updateRate,
+  fetchVideos,
+  fetchvideo,
+  fetchVideosByCreatorId,
 } = require("../controller/creatorController");
 
 
@@ -77,6 +80,22 @@ router.post(
   // userMiddleware,
   searchCreatorByUsername
 )
+
+// add colaborator
+router.post(
+  "/collab/:content_id",
+  requiredSignin,
+  userMiddleware,
+  creatorCollaborator
+)
+
+// fetch video
+router.get("/video/:videoId", requiredSignin, fetchvideo);
+router.get('/videos', requiredSignin, fetchVideos);
+router.get('/videos/:creatorId', requiredSignin, fetchVideosByCreatorId);
+
+
+// Like, Comment, Collaborate and Rate Proposal
 
 
 router.post("/like/:content_id", requiredSignin, userMiddleware, likeContent);
