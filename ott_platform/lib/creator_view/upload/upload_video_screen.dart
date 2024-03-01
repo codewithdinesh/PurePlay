@@ -9,12 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 
-import 'package:ott_platform/common_widget/round_button.dart';
-import 'package:ott_platform/global.dart';
-
-import 'package:ott_platform/model/UserData.dart';
-import 'package:ott_platform/model/collaborator.dart';
-import 'package:ott_platform/services/auth_service.dart';
 import 'package:video_player/video_player.dart';
 
 import 'package:chewie/chewie.dart';
@@ -22,7 +16,12 @@ import 'package:chewie/chewie.dart';
 import 'dart:async';
 
 import '../../common/color_extension.dart';
+import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
+import '../../global.dart';
+import '../../model/UserData.dart';
+import '../../model/collaborator.dart';
+import '../../services/auth_service.dart';
 import '../../utils/snackbar.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';

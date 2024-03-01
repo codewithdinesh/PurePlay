@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ott_platform/common_widget/custom_button.dart';
-import 'package:ott_platform/common_widget/video_player.dart';
+
 import 'common/color_extension.dart';
 
 class UserCreatorCardScreen extends StatelessWidget {

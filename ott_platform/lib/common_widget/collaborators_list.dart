@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ott_platform/model/collaborator.dart';
+
+import '../model/collaborator.dart';
+
 
 class CollaboratorsWidget extends StatefulWidget {
   final List<Collaborator> collaborators;

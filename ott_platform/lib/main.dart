@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:ott_platform/admin/admin_login_view.dart';
-import 'package:ott_platform/admin/admin_screen.dart';
-import 'package:ott_platform/admin/main_tab/admin_main_tab_view.dart';
-import 'package:ott_platform/common_widget/checkout1.dart';
-import 'package:ott_platform/content_approval_process/getcontent.dart';
-import 'package:ott_platform/creator_view/login/creator_login_view.dart';
-import 'package:ott_platform/creator_view/login/creator_register_view.dart';
-import 'package:ott_platform/creator_view/main_tab/creator_main_tab_view.dart';
-import 'package:ott_platform/splash_screen.dart';
-import 'package:ott_platform/user_creator_card_screen.dart';
-import 'package:ott_platform/user_view/login/login_view.dart';
-import 'package:ott_platform/user_view/login/register_view.dart';
-import 'package:ott_platform/user_view/main_tab/main_tab_view.dart';
+
 import 'package:firebase_core/firebase_core.dart';
+import 'admin/admin_login_view.dart';
+import 'admin/admin_screen.dart';
+import 'admin/main_tab/admin_main_tab_view.dart';
+import 'common_widget/checkout1.dart';
+import 'creator_view/login/creator_login_view.dart';
+import 'creator_view/login/creator_register_view.dart';
+import 'creator_view/main_tab/creator_main_tab_view.dart';
 import 'creator_view/upload/upload_video_screen.dart';
 import 'firebase_options.dart';
+import 'splash_screen.dart';
+import 'user_creator_card_screen.dart';
+import 'user_view/login/login_view.dart';
+import 'user_view/login/register_view.dart';
+import 'user_view/main_tab/main_tab_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

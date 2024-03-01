@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ott_platform/global.dart';
-import 'package:ott_platform/signin_backend/error_handling.dart';
-import 'package:ott_platform/utils/snackbar.dart';
-import 'package:ott_platform/signin_backend/userstruct.dart';
+import '../global.dart';
+import '../signin_backend/error_handling.dart';
+import '../utils/snackbar.dart';
+import '../signin_backend/userstruct.dart';
 
 class AuthService1 {
   // User SignIn

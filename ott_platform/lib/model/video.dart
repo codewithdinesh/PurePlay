@@ -1,6 +1,6 @@
 import 'dart:core';
 
-import 'package:ott_platform/model/creator.dart';
+import 'creator.dart';
 
 class Video {
   String id;

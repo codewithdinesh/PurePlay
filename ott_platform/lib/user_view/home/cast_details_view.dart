@@ -1,6 +1,8 @@
 import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
-import 'package:ott_platform/common/color_extension.dart';
+
+import '../../common/color_extension.dart';
+
 
 class CastDetailsView extends StatefulWidget {
   const CastDetailsView({super.key});

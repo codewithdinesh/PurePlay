@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ott_platform/user_view/login/register_view.dart';
+
 
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';

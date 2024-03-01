@@ -1,9 +1,10 @@
 import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ott_platform/common/color_extension.dart';
-import 'package:ott_platform/user_view/home/tv_show_details_view.dart';
+import '../../common/color_extension.dart';
 
+
+import '../../user_view/home/tv_show_details_view.dart';
 import 'movie_details_view.dart';
 
 class HomeView extends StatefulWidget {

@@ -4,17 +4,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:ott_platform/creator_view/login/creator_login_view.dart';
-import 'package:ott_platform/creator_view/main_tab/creator_main_tab_view.dart';
-import 'package:ott_platform/user_view/login/login_view.dart';
-import 'package:ott_platform/user_view/main_tab/main_tab_view.dart';
-import 'package:ott_platform/utils/Navigate.dart';
-import 'package:ott_platform/utils/snackbar.dart';
+
 
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
 import '../../global.dart';
+import '../../utils/snackbar.dart';
 
 class CreatorRegisterView extends StatefulWidget {
   const CreatorRegisterView({super.key});

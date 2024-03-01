@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ott_platform/common_widget/video.dart';
-import 'package:ott_platform/global.dart';
-import 'package:http/http.dart' as http;
-import 'package:ott_platform/model/creator.dart';
-import 'package:ott_platform/model/video.dart';
 
+import 'package:http/http.dart' as http;
+
+
+import 'common_widget/video.dart';
+import 'global.dart';
+import 'model/creator.dart';
+import 'model/video.dart';
 import 'services/auth_service.dart';
 
 class VideoScreen extends StatefulWidget {

@@ -1,22 +1,19 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:ott_platform/creator_view/login/creator_register_view.dart';
-import 'package:ott_platform/creator_view/main_tab/creator_main_tab_view.dart';
-import 'package:ott_platform/global.dart';
-import 'package:ott_platform/google_auth.dart';
-import 'package:ott_platform/model/UserData.dart';
-import 'package:ott_platform/services/auth_service.dart';
-import 'package:ott_platform/user_view/login/register_view.dart';
-import 'package:ott_platform/user_view/main_tab/main_tab_view.dart';
-import 'package:ott_platform/google_auth.dart';
-import 'package:ott_platform/utils/Navigate.dart';
-import 'package:ott_platform/utils/snackbar.dart';
+
 import 'package:http/http.dart' as http;
 
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
+import '../../global.dart';
+import '../../google_auth.dart';
+import '../../model/UserData.dart';
+import '../../services/auth_service.dart';
+import '../../utils/Navigate.dart';
+import '../../utils/snackbar.dart';
+import '../main_tab/creator_main_tab_view.dart';
 import 'forgot_password_view.dart';
 
 class CreatorLoginView extends StatefulWidget {

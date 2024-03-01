@@ -3,20 +3,15 @@ import 'dart:io';
 
 import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
-import 'package:ott_platform/common_widget/video.dart';
-import 'package:ott_platform/content_approval_process/displayonadminpage.dart';
-import 'package:ott_platform/global.dart';
-import 'package:ott_platform/model/UserData.dart';
-import 'package:ott_platform/model/video.dart';
-import 'package:ott_platform/upload_videos/uploading_videos.dart';
-import 'package:ott_platform/utils/snackbar.dart';
-import 'package:ott_platform/video_player_screen.dart';
-import 'package:video_player/video_player.dart';
 import '../../common/color_extension.dart';
 import '../../common_widget/round_text_field.dart';
+import '../../common_widget/video.dart';
+import '../../global.dart';
+import '../../model/UserData.dart';
 import '../../model/creator.dart';
+import '../../model/video.dart';
 import '../../services/auth_service.dart';
-import '../home/cast_details_view.dart';
+import '../../utils/snackbar.dart';
 import '../upload/upload_video_screen.dart';
 
 import 'package:http/http.dart' as http;
@@ -29,7 +24,7 @@ class UploadedView extends StatefulWidget {
 }
 
 class _UploadedViewState extends State<UploadedView> {
-  late final VideoUpload uploadVideo;
+  // late final VideoUpload uploadVideo;
   TextEditingController txtSearch = TextEditingController();
 
   List<Video> videos = [];
@@ -51,7 +46,7 @@ class _UploadedViewState extends State<UploadedView> {
     // TODO: implement initState
     super.initState();
 
-    uploadVideo = VideoUpload();
+    // uploadVideo = VideoUpload();
 
     fetchVideos();
     FBroadcast.instance().register("change_mode", (value, callback) {

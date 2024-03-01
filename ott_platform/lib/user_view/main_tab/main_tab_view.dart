@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ott_platform/common/color_extension.dart';
-import 'package:ott_platform/user_view/download/download_view.dart';
-import 'package:ott_platform/user_view/home/home_view.dart';
-import 'package:ott_platform/user_view/profile/profile_view.dart';
+
 import 'package:fbroadcast/fbroadcast.dart';
 
+import '../../common/color_extension.dart';
+import '../download/download_view.dart';
+import '../home/home_view.dart';
+import '../profile/profile_view.dart';
 import '../search/search_view.dart';
 
 class MainTabView extends StatefulWidget {

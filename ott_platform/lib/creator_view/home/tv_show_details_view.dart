@@ -1,10 +1,10 @@
 import 'package:fbroadcast/fbroadcast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:ott_platform/common/color_extension.dart';
-import 'package:ott_platform/common_widget/video.dart';
+import '../../common/color_extension.dart';
 
 import '../../../../../../../common_widget/round_button.dart';
+import '../../common_widget/video.dart';
 
 class TvShowDetailsView extends StatefulWidget {
   const TvShowDetailsView({super.key});

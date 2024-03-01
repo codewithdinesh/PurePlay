@@ -2,18 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:ott_platform/admin/main_tab/admin_main_tab_view.dart';
-import 'package:ott_platform/user_view/login/register_view.dart';
-import 'package:ott_platform/utils/Navigate.dart';
+
 import '../../common/color_extension.dart';
 import '../../common_widget/round_button.dart';
 import '../../common_widget/round_text_field.dart';
-import 'package:ott_platform/main.dart';
+
 
 import '../global.dart';
 import '../model/UserData.dart';
 import '../services/auth_service.dart';
+import '../utils/Navigate.dart';
 import '../utils/snackbar.dart';
+import 'main_tab/admin_main_tab_view.dart';
 
 class AdminLoginView extends StatefulWidget {
   const AdminLoginView({super.key});
