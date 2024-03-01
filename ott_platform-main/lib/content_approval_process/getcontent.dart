@@ -8,7 +8,8 @@ class VideoListScreen extends StatefulWidget {
   List<String> videoPaths;
 
   Future<void> fetchVideos() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:3000/getcontent'));//ip:3000
+    final response =
+        await http.get(Uri.parse('http://10.0.2.2:3000/getcontent')); //ip:3000
     if (response.statusCode == 200) {
       videoPaths = parseVideoPaths(response.body);
       // Display videos using Flutter Video Player
@@ -26,7 +27,8 @@ class VideoListScreen extends StatefulWidget {
     List<dynamic> videosaths = data['videosPaths'];
 
     // Convert the paths to List<String>
-    List<String> videoPaths = videosaths.map((video) => video['videoStream'].toString()).toList();
+    List<String> videoPaths =
+        videosaths.map((video) => video['videoStream'].toString()).toList();
     // final Map<String, dynamic> data = json.decode(responseBody);
     // List<dynamic> videosPaths = data['videosPaths'];
     // return videosPaths.map((video) => video['videoStream'].toString()).toList();
@@ -39,7 +41,7 @@ class VideoListScreen extends StatefulWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:const Text('Video List'),
+        title: const Text('Video List'),
       ),
       body: ListView.builder(
         itemCount: videoPaths.length,
@@ -50,7 +52,8 @@ class VideoListScreen extends StatefulWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => VideoPlayerScreen(videoPaths[index].toString()),
+                  builder: (context) =>
+                      VideoPlayerScreen(videoPaths[index].toString()),
                 ),
               );
             },

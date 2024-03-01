@@ -215,15 +215,16 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
 
       final contentResponse = jsonDecode(contentRequest.body);
 
-      final msg = contentResponse['message'];
+      String? msg = contentResponse['message'];
       final content_id = contentResponse['content_id'];
 
       print("Content Response: $contentResponse");
 
-      if (msg) {
-        showSnackBar(context, msg, isError: true);
-        return;
-      }
+      // if (contentRequest.statusCode != 200 ||
+      //     contentRequest.statusCode != 201) {
+      //   showSnackBar(context, msg.toString(), isError: true);
+      //   return;
+      // }
 
       // Step 2: Call "/api/v1/upload-video/:content_id" with Bearer token
       final request = http.MultipartRequest(
@@ -254,62 +255,48 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
           filename: 'video.mp4', contentType: MediaType.parse(mimeType!)));
 
       // Send request
-      final response = await request.send();
+      final streamedResponse = await request.send();
+// Handle response
+      final response = await http.Response.fromStream(streamedResponse);
 
-      final totalBytes = response.contentLength ?? -1;
-      int uploadedBytes = 0;
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print("Video uploaded successfully: ${response.body}");
 
-      response.stream.listen(
-        (List<int> chunk) {
-          uploadedBytes += chunk.length;
-          setState(() {
-            _uploadProgress = uploadedBytes / totalBytes;
-          });
-        },
-        onDone: () async {
-          // Check HTTP status code
-          if (response.statusCode == 201 || response.statusCode == 200) {
-            final videoResponse = await http.Response.fromStream(response);
-            print("Video uploaded successfully: ${videoResponse.body}");
+        _uploadStatus = 'Video uploaded successfully';
 
-            _uploadStatus = 'Video uploaded successfully';
+        // Add collaborators
+        // Step 3: Call "/api/v1/content-collaboration/:content_id" with Bearer token
+        for (int index = 0; index < _collaborators.length; index++) {
+          final collabRequest = await http.post(
+            Uri.parse("$uri/api/v1/collab/$content_id"),
+            headers: {
+              HttpHeaders.authorizationHeader: 'Bearer $userToken',
+              HttpHeaders.contentTypeHeader: 'application/json',
+            },
+            body: jsonEncode({
+              "collaborator_id": _collaborators[index].id,
+            }),
+          );
 
-            // add colaborators
-            // Step 3: Call "/api/v1/content-collabration/:content_id" with Bearer token
+          print("Collab Request: ${collabRequest.body}");
 
-            for (int index = 0; index < _collaborators.length; index++) {
-              final collabRequest = await http.post(
-                Uri.parse("$uri/api/v1/content-collabration/$content_id"),
-                headers: {
-                  HttpHeaders.authorizationHeader: 'Bearer $userToken',
-                  HttpHeaders.contentTypeHeader: 'application/json',
-                },
-                body: jsonEncode({
-                  "collaborator_id": _collaborators[index].id,
-                }),
-              );
-
-              print("Collab Response: ${collabRequest.body}");
-            }
-
-            showSnackBar(context, "Video uploaded successfully");
-          } else {
-            print("Error: ${response}");
-
-            showSnackBar(context, "Error uploading video", isError: true);
+          if (collabRequest.statusCode != 200 &&
+              collabRequest.statusCode != 201) {
+            showSnackBar(context, "Error adding collaborator", isError: true);
+            return;
           }
-        },
-        onError: (error) {
-          print("Error uploading video: $error");
-          showSnackBar(context, "Error uploading video", isError: true);
-        },
-        cancelOnError: true,
-      );
+
+          print("Collab Response: ${collabRequest.body}");
+        }
+
+        showSnackBar(context, "Video uploaded successfully");
+      } else {
+        print("Error uploading video: ${response.body}");
+        showSnackBar(context, "Error uploading video", isError: true);
+      }
     } catch (error) {
       print("Error uploading video: $error");
-
       _uploadStatus = 'Error uploading video: $error';
-
       showSnackBar(context, "Error uploading video", isError: true);
     } finally {
       setState(() {
@@ -608,12 +595,15 @@ class _VideoUploadScreenState extends State<VideoUploadScreen> {
               const SizedBox(height: 8.0),
               // show loading if video is uploading
               // show uploading status
-              if (_uploading && _uploadStatus.isNotEmpty)
+              if (_uploading)
                 Column(
                   children: [
-                    LinearProgressIndicator(value: _uploadProgress),
+                    CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.blue,
+                    ),
                     const SizedBox(height: 8),
-                    Text('Uploading $_uploadProgress / 100'),
+                    Text('Uploading Video...'),
                   ],
                 ),
 

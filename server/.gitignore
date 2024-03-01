@@ -4,3 +4,4 @@ node_modules/
 start.cmd
 /sampleOutput.md
 uploads/
+server\uploads\

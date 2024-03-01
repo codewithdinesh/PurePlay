@@ -54,8 +54,6 @@ class MyApp extends StatelessWidget {
         '/adminloginview': (context) => const AdminLoginView(),
         '/adminmaintabview': (context) => const AdminMainTabView(),
         '/checkout': (context) => const CheckoutOnePage(),
-        '/videoListScreen': (context) =>
-            VideoListScreen(context as List<String>),
       },
     );
   }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chewie/chewie.dart';
 import 'package:video_player/video_player.dart';
@@ -12,38 +13,61 @@ class VideoPlayerWidget extends StatefulWidget {
 }
 
 class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
-  late VideoPlayerController _videoPlayerController;
-  late ChewieController _chewieController;
+  VideoPlayerController? _controller;
+  ChewieController? _chewieController;
 
   @override
   void initState() {
     super.initState();
-    // _videoPlayerController = VideoPlayerController.networkUrl();
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController,
-      autoPlay: true,
-      looping: true,
-      showControls: true,
-      materialProgressColors: ChewieProgressColors(
-        playedColor: Colors.red,
-        handleColor: Colors.redAccent,
-        backgroundColor: Colors.grey,
-        bufferedColor: Colors.grey[300]!,
-      ),
-      placeholder: Container(
-        color: Colors.grey[300],
-        child: const Center(
-          child: CircularProgressIndicator(),
+    _initializeVideoPlayer();
+  }
+
+  Future<void> _initializeVideoPlayer() async {
+    await _playVideo(widget.videoPath);
+  }
+
+  Future<void> _playVideo(String videoPath) async {
+    if (videoPath != null) {
+      print("File Path: ${videoPath}");
+
+      late VideoPlayerController controller;
+
+      // Video sources can be either an asset or a network resource.
+
+      controller = VideoPlayerController.networkUrl(Uri.parse(videoPath));
+
+      await controller.initialize();
+
+      _controller = controller;
+
+      _chewieController = ChewieController(
+        videoPlayerController: _controller!,
+        autoPlay: true,
+        looping: true,
+        showControls: true,
+        // autoInitialize: true,
+        allowMuting: true,
+        allowPlaybackSpeedChanging: true,
+        showOptions: true,
+        aspectRatio: 16 / 9,
+
+        hideControlsTimer: const Duration(seconds: 1),
+        materialProgressColors: ChewieProgressColors(
+          playedColor: Colors.red,
+          handleColor: Colors.red,
+          backgroundColor: Colors.grey,
+          bufferedColor: Colors.lightGreen,
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    _videoPlayerController.dispose();
-    _chewieController.dispose();
+    _controller?.dispose();
+    _chewieController?.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,8 +77,24 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: Chewie(
-        controller: _chewieController,
+      child: Column(
+        children: <Widget>[
+          Expanded(
+            child: _chewieController != null &&
+                    _chewieController!.videoPlayerController.value.isInitialized
+                ? Chewie(
+                    controller: _chewieController!,
+                  )
+                : const Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 20),
+                      Text('Loading'),
+                    ],
+                  ),
+          ),
+        ],
       ),
     );
   }
